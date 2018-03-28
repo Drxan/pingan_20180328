@@ -42,3 +42,24 @@ def create_lstm_cnn(input_shape):
 
     return model
 
+
+def create_cnn(input_shape):
+    # CNN part
+    model_cnn = Sequential()
+    model_cnn.add(Conv1D(filters=256, kernel_size=3, padding='valid', input_shape=input_shape, activation='relu'))
+    model_cnn.add(MaxPooling1D(pool_size=3))
+    model_cnn.add(Conv1D(filters=128, kernel_size=3, padding='valid', activation='relu'))
+    model_cnn.add(MaxPooling1D(pool_size=3))
+    model_cnn.add(Conv1D(filters=128, kernel_size=3, padding='valid', activation='relu'))
+    model_cnn.add(MaxPooling1D(pool_size=5))
+    model_cnn.add(Conv1D(filters=128, kernel_size=3, padding='valid', activation='relu'))
+    model_cnn.add(MaxPooling1D(pool_size=12))
+    model_cnn.add(Flatten())
+    model_cnn.add(Dropout(0.3))
+    model_cnn.add(Dense(128, activation='relu'))
+    model_cnn.add(Dropout(0.5))
+    model_cnn.add(Dense(64, activation='tanh'))
+    model_cnn.add(Dense(1))
+
+    return model_cnn
+

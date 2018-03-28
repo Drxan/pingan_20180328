@@ -24,13 +24,13 @@ def process():
     print(x_train.shape, x_train[0].shape)
 
     print('>>>(2).Creating model...')
-    model = models.create_lstm_cnn(x_train[0].shape)
+    model = models.create_cnn(x_train[0].shape)
     model.compile(optimizer='adam', loss=losses.mse)
     print(model.summary())
 
     print('>>>(3).Training model...')
     early_stop = EarlyStopping(monitor='val_loss', patience=5)
-    hist = model.fit([x_train, x_train],
+    hist = model.fit(x_train,
                      y_train,
                      batch_size=256,
                      epochs=1000,
@@ -45,7 +45,7 @@ def process():
     x_test, _, _, users = data_helper.get_xy(path_test, process_params)
 
     print('>>>(5).Predicting...')
-    predicts = model.predict([x_test, x_test])
+    predicts = model.predict(x_test)
 
     print('>>>(6).Saving results...')
     predicts = np.array(predicts).reshape(-1)
