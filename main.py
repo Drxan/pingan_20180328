@@ -6,15 +6,16 @@ import numpy as np
 import pandas as pd
 
 # ---------submit------------
-'''
-path_train = '/data/dm/train.csv' # r'D:\yuwei\study\competition\pingan\train.csv'  # 训练文件
-path_test = '/data/dm/test.csv' # r'D:\yuwei\study\competition\pingan\test.csv'  # 测试文件
-path_test_out = "model/"  # 预测结果输出路径为model/xx.csv,有且只能有一个文件并且是CSV格式。
+
+path_train = '/data/dm/train.csv'
+path_test = '/data/dm/test.csv'
+path_test_out = "model/"  
 '''
 # --------local test---------
-path_train = r'D:\yuwei\study\competition\pingan\train.csv'  # 训练文件
-path_test = r'D:\yuwei\study\competition\pingan\test.csv'  # 测试文件
-path_test_out = "model/"  # 预测结果输出路径为model/xx.csv,有且只能有一个文件并且是CSV格式。
+path_train = 'D:\\yuwei\\study\\competition\\pingan\\train.csv'  # 训练文件
+path_test = 'D:\\yuwei\\study\\competition\\pingan\\test.csv'  # 测试文件
+path_test_out = "model/"
+'''
 
 
 def process():
@@ -23,13 +24,19 @@ def process():
     print(x_train.shape, x_train[0].shape)
 
     print('>>>(2).Creating model...')
-    model = models.create_model(x_train[0].shape, drop_out=0.5)
+    model = models.create_lstm_cnn(x_train[0].shape)
     model.compile(optimizer='adam', loss=losses.mse)
     print(model.summary())
 
     print('>>>(3).Training model...')
     early_stop = EarlyStopping(monitor='val_loss', patience=5)
-    hist = model.fit(x_train, y_train, batch_size=128, epochs=1000, validation_split=0.2, callbacks=[early_stop])
+    hist = model.fit([x_train, x_train],
+                     y_train,
+                     batch_size=256,
+                     epochs=1000,
+                     validation_split=0.2,
+                     callbacks=[early_stop],
+                     verbose=2)
 
     del x_train
     del y_train
@@ -38,7 +45,7 @@ def process():
     x_test, _, _, users = data_helper.get_xy(path_test, process_params)
 
     print('>>>(5).Predicting...')
-    predicts = model.predict(x_test)
+    predicts = model.predict([x_test, x_test])
 
     print('>>>(6).Saving results...')
     predicts = np.array(predicts).reshape(-1)
