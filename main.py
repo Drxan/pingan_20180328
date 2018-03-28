@@ -1,52 +1,53 @@
-﻿# -*- coding:utf8 -*-
-import os
-import csv
+﻿# -*- coding:utf-8 -*-
+from pingan import data_helper, models
+from keras import losses
+from keras.callbacks import EarlyStopping
+import numpy as np
 import pandas as pd
 
-path_train = "/data/dm/train.csv"  # 训练文件
-path_test = "/data/dm/test.csv"  # 测试文件
-
+# ---------submit------------
+'''
+path_train = '/data/dm/train.csv' # r'D:\yuwei\study\competition\pingan\train.csv'  # 训练文件
+path_test = '/data/dm/test.csv' # r'D:\yuwei\study\competition\pingan\test.csv'  # 测试文件
+path_test_out = "model/"  # 预测结果输出路径为model/xx.csv,有且只能有一个文件并且是CSV格式。
+'''
+# --------local test---------
+path_train = r'D:\yuwei\study\competition\pingan\train.csv'  # 训练文件
+path_test = r'D:\yuwei\study\competition\pingan\test.csv'  # 测试文件
 path_test_out = "model/"  # 预测结果输出路径为model/xx.csv,有且只能有一个文件并且是CSV格式。
 
 
-def read_csv():
-    """
-    文件读取模块，头文件见columns.
-    :return: 
-    """
-    # for filename in os.listdir(path_train):
-    tempdata = pd.read_csv(path_train)
-    tempdata.columns = ["TERMINALNO", "TIME", "TRIP_ID", "LONGITUDE", "LATITUDE", "DIRECTION", "HEIGHT", "SPEED",
-                        "CALLSTATE", "Y"]
-
-
 def process():
-    """
-    处理过程，在示例中，使用随机方法生成结果，并将结果文件存储到预测结果路径下。
-    :return: 
-    """
-    import numpy as np
+    print('>>>(1).Preparing train data...')
+    x_train, y_train, process_params, _ = data_helper.get_xy(path_train, target='Y')
+    print(x_train.shape, x_train[0].shape)
 
-    with open(path_test) as lines:
-        with(open(os.path.join(path_test_out, "test.csv"), mode="w")) as outer:
-            writer = csv.writer(outer)
-            i = 0
-            ret_set = set([])
-            for line in lines:
-                if i == 0:
-                    i += 1
-                    writer.writerow(["Id", "Pred"])  # 只有两列，一列Id为用户Id，一列Pred为预测结果(请注意大小写)。
-                    continue
-                item = line.split(",")
-                if item[0] in ret_set:
-                    continue
-                # 此处使用随机值模拟程序预测结果
-                writer.writerow([item[0], np.random.rand()]) # 随机值
-                
-                ret_set.add(item[0])  # 根据赛题要求，ID必须唯一。输出预测值时请注意去重
+    print('>>>(2).Creating model...')
+    model = models.create_model(x_train[0].shape, drop_out=0.5)
+    model.compile(optimizer='adam', loss=losses.mse)
+    print(model.summary())
+
+    print('>>>(3).Training model...')
+    early_stop = EarlyStopping(monitor='val_loss', patience=5)
+    hist = model.fit(x_train, y_train, batch_size=128, epochs=1000, validation_split=0.2, callbacks=[early_stop])
+
+    del x_train
+    del y_train
+
+    print('>>>(4).Preparing test data...')
+    x_test, _, _, users = data_helper.get_xy(path_test, process_params)
+
+    print('>>>(5).Predicting...')
+    predicts = model.predict(x_test)
+
+    print('>>>(6).Saving results...')
+    predicts = np.array(predicts).reshape(-1)
+    pred_csv = pd.DataFrame(columns=['Id', 'Pred'])
+    pred_csv['Id'] = users
+    pred_csv['Pred'] = predicts
+    pred_csv.to_csv(path_test_out+'pred.csv', index=False)
 
 
 if __name__ == "__main__":
     print("****************** start **********************")
-    # 程序入口
     process()
