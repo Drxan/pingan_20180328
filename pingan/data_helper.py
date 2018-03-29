@@ -176,7 +176,7 @@ def train_test_split(data_path, test_ratio=0.25, random_state=0):
     return train, test
 
 
-def generate_xy(data_files, target_file, x_dim, batch_size=128, max_len=128):
+def generate_xy(data_files, target_file, x_dim, batch_size=128, max_len=128, x_num=1):
 
     targets = np.load(target_file)
     if len(data_files) < batch_size:
@@ -204,10 +204,12 @@ def generate_xy(data_files, target_file, x_dim, batch_size=128, max_len=128):
                     x_values = x_values[trunc_len:, :]
                 x[idx, :, :] = x_values
                 y.append(targets[user_idx, 1])
+            if x_num > 1:
+                x = [x]*x_num
             yield x, np.array(y)
 
 
-def generate_x(data_files, x_dim, batch_size=128, max_len=128):
+def generate_x(data_files, x_dim, batch_size=128, max_len=128, x_num=1):
 
     data_len = len(data_files)
     if data_len < batch_size:
@@ -232,5 +234,7 @@ def generate_x(data_files, x_dim, batch_size=128, max_len=128):
                     trunc_len = x_values.shape[0] - max_len
                     x_values = x_values[trunc_len:, :]
                 x[idx, :, :] = x_values
+            if x_num > 1:
+                x = [x]*x_num
             yield x
 
