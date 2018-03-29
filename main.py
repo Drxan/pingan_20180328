@@ -8,7 +8,7 @@ import pandas as pd
 import os
 
 # ---------submit------------
-'''
+
 path_train = '/data/dm/train.csv'
 path_test = '/data/dm/test.csv'
 path_test_out = "model/"  
@@ -17,7 +17,7 @@ path_test_out = "model/"
 path_train = '/home/yw/study/Competition/pingan/train.csv'  # 训练文件
 path_test = '/home/yw/study/Competition/pingan/test.csv'  # 测试文件
 path_test_out = "model/"
-
+'''
 
 CURRENT_PATH = os.getcwd()
 BATCH_SIZE = 128
