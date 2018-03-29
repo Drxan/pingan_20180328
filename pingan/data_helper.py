@@ -3,6 +3,7 @@ import numpy as np
 import datetime
 from sklearn.preprocessing import OneHotEncoder
 import os
+import shutil
 
 
 def load_data(data_path):
@@ -125,57 +126,111 @@ def extract_feature(data_path, data_process_params=None, target=None):
         return df[['TERMINALNO']+features + [target]], features, process_params
 
 
-def prepare_data(df,target=None):
-    pass
+def save_data(df, feature_names, data_dir, target=None):
+
+    length = []
+
+    users = df['TERMINALNO'].unique()
+    # make dir to save datas
+    if os.path.exists(data_dir):
+        shutil.rmtree(data_dir)
+    os.makedirs(data_dir)
+
+    os.chdir(data_dir)
+    features_dir = os.path.join(data_dir, 'datas/')
+    os.makedirs('datas/')
+
+    # save a feature file for each user
+    id_target = np.zeros((len(users), 2), dtype=np.float32)
+    for idx, uid in enumerate(users):
+        user_features = df.loc[df['TERMINALNO'] == uid, feature_names]
+        length.append(user_features.shape[0])
+        file_name = os.path.join(features_dir, str(idx)+r'.npy')
+        np.save(file_name, user_features)
+        id_target[idx, 0] = uid
+        if target is not None:
+            id_target[idx, 1] = df.loc[df['TERMINALNO'] == uid, target].values[0]
+
+    # save the targes file
+    targets_file_name = os.path.join(data_dir, 'targets.npy')
+    np.save(targets_file_name, id_target)
+    return length
 
 
+def prepare_data(raw_data_path, target_data_dir, process_params=None, target=None):
+    df_feat, feature_names, params = extract_feature(raw_data_path, process_params, target=target)
+    lens = save_data(df_feat, feature_names, target_data_dir, target=target)
+    return params, len(feature_names), lens
 
 
+def train_test_split(data_path, test_ratio=0.25, random_state=0):
+
+    feature_path = os.path.join(data_path, 'datas')
+    data_files = np.array([os.path.join(feature_path, df) for df in os.listdir(feature_path)])
+    data_files.sort()
+    np.random.seed(random_state)
+    np.random.shuffle(data_files)
+    k = int(test_ratio*len(data_files))
+    train = data_files[k:]
+    test = data_files[:k]
+    return train, test
 
 
-def prepare_model_data(feature_df, max_len, features, target=None):
-    x_dim = len(features)
-    users = feature_df['TERMINALNO'].unique()
+def generate_xy(data_files, target_file, x_dim, batch_size=128, max_len=128):
 
-    x_list = np.zeros((len(users), max_len, x_dim)).astype(np.float32)
-    y_list = []
-
-    if target:
-        for idx, uid in enumerate(users):
-            x_values = feature_df.loc[feature_df['TERMINALNO'] == uid, features]
-            y = feature_df.loc[feature_df['TERMINALNO'] == uid, target].values[0]
-            # padding
-            if x_values.shape[0] < max_len:
-                pad_len = max_len - x_values.shape[0]
-                pad_values = np.zeros((pad_len, x_dim))
-                x_values = np.concatenate([x_values, pad_values])
-            # truncating
-            if x_values.shape[0] > max_len:
-                trunc_len = x_values.shape[0] - max_len
-                x_values = x_values.values[trunc_len:, :]
-            x_list[idx, :, :] = x_values.astype(np.float32)
-            y_list.append(y)
+    targets = np.load(target_file)
+    if len(data_files) < batch_size:
+        batches = 1
+        batch_size = len(data_files)
     else:
-        for idx, uid in enumerate(users):
-            x_values = feature_df.loc[feature_df['TERMINALNO'] == uid, features]
-            # padding
-            if x_values.shape[0] < max_len:
-                pad_len = max_len - x_values.shape[0]
-                pad_values = np.zeros((pad_len, x_dim))
-                x_values = np.concatenate([x_values, pad_values])
-            # truncating
-            if x_values.shape[0] > max_len:
-                trunc_len = x_values.shape[0] - max_len
-                x_values = x_values.values[trunc_len:, :]
-            x_list[idx, :, :] = x_values.astype(np.float32)
-    return x_list, np.array(y_list).astype(np.float32)
+        batches = len(data_files)//batch_size
+    data_files = data_files.copy()
+    while True:
+        np.random.shuffle(data_files)
+        for batch in range(batches):
+            x = np.zeros((batch_size, max_len, x_dim), dtype=np.float32)
+            y = []
+            for idx, file_name in enumerate(data_files[batch:batch+batch_size]):
+                user_idx = int(os.path.split(file_name)[1].split(r'.')[0])
+                x_values = np.load(file_name)
+                # padding
+                if x_values.shape[0] < max_len:
+                    pad_len = max_len - x_values.shape[0]
+                    pad_values = np.zeros((pad_len, x_dim))
+                    x_values = np.concatenate([x_values, pad_values])
+                # truncating
+                if x_values.shape[0] > max_len:
+                    trunc_len = x_values.shape[0] - max_len
+                    x_values = x_values[trunc_len:, :]
+                x[idx, :, :] = x_values
+                y.append(targets[user_idx, 1])
+            yield x, np.array(y)
 
 
-def get_xy(data_path, batch_size=128, data_process_params=None, target=None, max_len=None):
-    feature_df, feature_names, process_params = extract_feature(data_path, data_process_params, target)
-    users = feature_df['TERMINALNO'].unique()
-    if max_len is None:
-        max_len = int(feature_df['TERMINALNO'].value_counts().mean())
-    x_data, y_data = prepare_model_data(feature_df, max_len, feature_names, target=target)
-    return x_data, y_data, process_params, users
+def generate_x(data_files, x_dim, batch_size=128, max_len=128):
+
+    data_len = len(data_files)
+    if data_len < batch_size:
+        batches = 1
+    elif (data_len % batch_size) > 0:
+        batches = data_len//batch_size+1
+    else:
+        batches = data_len//batch_size
+    while True:
+        for batch in range(batches):
+            x = np.zeros((batch_size, max_len, x_dim), dtype=np.float32)
+            for idx, file_name in enumerate(data_files[batch:min(batch+batch_size, data_len)]):
+                user_idx = int(os.path.split(file_name)[1].split(r'.')[0])
+                x_values = np.load(file_name)
+                # padding
+                if x_values.shape[0] < max_len:
+                    pad_len = max_len - x_values.shape[0]
+                    pad_values = np.zeros((pad_len, x_dim))
+                    x_values = np.concatenate([x_values, pad_values])
+                # truncating
+                if x_values.shape[0] > max_len:
+                    trunc_len = x_values.shape[0] - max_len
+                    x_values = x_values[trunc_len:, :]
+                x[idx, :, :] = x_values
+            yield x
 

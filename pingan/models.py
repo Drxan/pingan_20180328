@@ -28,7 +28,7 @@ def create_lstm_cnn(input_shape):
     model_cnn.add(Conv1D(filters=128, kernel_size=3, padding='valid', activation='relu'))
     model_cnn.add(MaxPooling1D(pool_size=5))
     model_cnn.add(Conv1D(filters=64, kernel_size=3, padding='valid', activation='relu'))
-    model_cnn.add(MaxPooling1D(pool_size=43))
+    model_cnn.add(MaxPooling1D(pool_size=model_cnn.output_shape[1]))
     model_cnn.add(Flatten())
     model_cnn.add(Dropout(0.5))
 
@@ -53,7 +53,7 @@ def create_cnn(input_shape):
     model_cnn.add(Conv1D(filters=128, kernel_size=3, padding='valid', activation='relu'))
     model_cnn.add(MaxPooling1D(pool_size=5))
     model_cnn.add(Conv1D(filters=128, kernel_size=3, padding='valid', activation='relu'))
-    model_cnn.add(MaxPooling1D(pool_size=12))
+    model_cnn.add(MaxPooling1D(pool_size=model_cnn.output_shape[1]))
     model_cnn.add(Flatten())
     model_cnn.add(Dropout(0.3))
     model_cnn.add(Dense(128, activation='relu'))
