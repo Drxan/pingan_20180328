@@ -1,12 +1,12 @@
 ﻿# -*- coding:utf-8 -*-
-from pingan import data_helper, models
+from pingan import data_helper_old, models
 from keras import losses
 from keras.callbacks import EarlyStopping
 import numpy as np
 import pandas as pd
 
 # ---------submit------------
-
+'''
 path_train = '/data/dm/train.csv'
 path_test = '/data/dm/test.csv'
 path_test_out = "model/"  
@@ -15,12 +15,11 @@ path_test_out = "model/"
 path_train = 'D:\\yuwei\\study\\competition\\pingan\\train.csv'  # 训练文件
 path_test = 'D:\\yuwei\\study\\competition\\pingan\\test.csv'  # 测试文件
 path_test_out = "model/"
-'''
 
 
 def process():
     print('>>>(1).Preparing train data...')
-    x_train, y_train, process_params, _ = data_helper.get_xy(path_train, target='Y')
+    x_train, y_train, process_params, _ = data_helper_old.get_xy(path_train, target='Y')
     print(x_train.shape, x_train[0].shape)
 
     print('>>>(2).Creating model...')
@@ -32,7 +31,7 @@ def process():
     early_stop = EarlyStopping(monitor='val_loss', patience=5)
     hist = model.fit(x_train,
                      y_train,
-                     batch_size=256,
+                     batch_size=16,
                      epochs=1000,
                      validation_split=0.2,
                      callbacks=[early_stop],
@@ -42,7 +41,7 @@ def process():
     del y_train
 
     print('>>>(4).Preparing test data...')
-    x_test, _, _, users = data_helper.get_xy(path_test, process_params)
+    x_test, _, _, users = data_helper_old.get_xy(path_test, process_params)
 
     print('>>>(5).Predicting...')
     predicts = model.predict(x_test)

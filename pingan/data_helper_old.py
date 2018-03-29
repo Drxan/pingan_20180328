@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import datetime
 from sklearn.preprocessing import OneHotEncoder
-import os
 
 
 def load_data(data_path):
@@ -125,13 +124,6 @@ def extract_feature(data_path, data_process_params=None, target=None):
         return df[['TERMINALNO']+features + [target]], features, process_params
 
 
-def prepare_data(df,target=None):
-    pass
-
-
-
-
-
 
 def prepare_model_data(feature_df, max_len, features, target=None):
     x_dim = len(features)
@@ -168,14 +160,13 @@ def prepare_model_data(feature_df, max_len, features, target=None):
                 trunc_len = x_values.shape[0] - max_len
                 x_values = x_values.values[trunc_len:, :]
             x_list[idx, :, :] = x_values.astype(np.float32)
-    return x_list, np.array(y_list).astype(np.float32)
+    return x_list, np.array(y_list).astype(np.float32), users
 
 
-def get_xy(data_path, batch_size=128, data_process_params=None, target=None, max_len=None):
+def get_xy(data_path, data_process_params=None, target=None, max_len=None):
     feature_df, feature_names, process_params = extract_feature(data_path, data_process_params, target)
-    users = feature_df['TERMINALNO'].unique()
     if max_len is None:
         max_len = int(feature_df['TERMINALNO'].value_counts().mean())
-    x_data, y_data = prepare_model_data(feature_df, max_len, feature_names, target=target)
+    x_data, y_data, users = prepare_model_data(feature_df, max_len, feature_names, target=target)
     return x_data, y_data, process_params, users
 
