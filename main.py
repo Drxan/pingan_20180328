@@ -20,7 +20,7 @@ path_test_out = "model/"
 '''
 
 CURRENT_PATH = os.getcwd()
-BATCH_SIZE = 128
+BATCH_SIZE = 256
 EPOCHES = 1000
 
 
@@ -40,7 +40,7 @@ def process():
     print('>>>[3].Split data into the train and validate...')
     train_data, val_data = data_helper.train_test_split(train_data_path, test_ratio=0.2, random_state=9)
     target_file = os.path.join(train_data_path, 'targets.npy')
-    max_len = int(np.percentile(lens, 80))
+    max_len = int(np.percentile(lens, 85))
     x_dim = feature_num
 
     print('>>>[4].Creating model...')
@@ -59,7 +59,12 @@ def process():
                                callbacks=[early_stop],
                                validation_data=generate_xy(val_data, target_file, x_dim, batch_size=val_batch_size, max_len=max_len, x_num=2),
                                validation_steps=val_steps,
-                               initial_epoch=0)
+                               initial_epoch=0,
+                               verbose=2)
+    print('Total user count:', len(train_data) + len(val_data))
+    train_loss = model.evaluate_generator(generate_xy(train_data, target_file, x_dim, batch_size=256, max_len=max_len, x_num=2),
+                             steps=max(len(train_data)//256, 1))
+    print('train_loss:', train_loss)
 
     print('>>>[6].Predicting...')
     pred_batch_size = 256
