@@ -6,6 +6,7 @@ from keras.callbacks import EarlyStopping
 import numpy as np
 import pandas as pd
 import os
+from keras import metrics
 
 # ---------submit------------
 
@@ -38,14 +39,15 @@ def process():
     os.chdir(CURRENT_PATH)
 
     print('>>>[3].Split data into the train and validate...')
-    train_data, val_data = data_helper.train_test_split(train_data_path, test_ratio=0.2, random_state=9)
+    train_data, val_data = data_helper.train_test_split(train_data_path, test_ratio=0.3, random_state=9)
     target_file = os.path.join(train_data_path, 'targets.npy')
     max_len = int(np.percentile(lens, 85))
     x_dim = feature_num
 
     print('>>>[4].Creating model...')
-    model = models.create_lstm_cnn((max_len, x_dim))
-    model.compile(optimizer='adam', loss=losses.mse)
+    model = models.create_cnn((max_len, x_dim))
+
+    model.compile(optimizer='adam', loss=losses.cosine)
     print(model.summary())
 
     print('val steps:', len(val_data)//BATCH_SIZE)
@@ -53,21 +55,28 @@ def process():
     early_stop = EarlyStopping(monitor='val_loss', patience=5)
     val_batch_size = int(len(val_data)/10)
     val_steps = len(val_data)//val_batch_size
-    hist = model.fit_generator(generate_xy(train_data, target_file, x_dim, batch_size=BATCH_SIZE, max_len=max_len, x_num=2),
+    num_input = 1
+    hist = model.fit_generator(generate_xy(train_data, target_file, x_dim, batch_size=BATCH_SIZE, max_len=max_len, x_num=num_input),
                                steps_per_epoch=max(len(train_data)//BATCH_SIZE, 1),
                                epochs=EPOCHES,
                                callbacks=[early_stop],
-                               validation_data=generate_xy(val_data, target_file, x_dim, batch_size=val_batch_size, max_len=max_len, x_num=2),
+                               validation_data=generate_xy(val_data, target_file, x_dim, batch_size=val_batch_size, max_len=max_len, x_num=num_input),
                                validation_steps=val_steps,
                                initial_epoch=0,
                                verbose=2)
+    bst_epoch = len(hist.epoch)
+
+    model.fit_generator(
+        generate_xy(np.concatenate([train_data, val_data]), target_file, x_dim, batch_size=BATCH_SIZE, max_len=max_len, x_num=num_input),
+        steps_per_epoch=max(len(train_data) // BATCH_SIZE, 1),
+        epochs=bst_epoch,
+        initial_epoch=0,
+        verbose=2)
+
     print('Total user count:', len(train_data) + len(val_data))
-    train_loss = model.evaluate_generator(generate_xy(train_data, target_file, x_dim, batch_size=256, max_len=max_len, x_num=2),
-                             steps=max(len(train_data)//256, 1))
-    print('train_loss:', train_loss)
 
     print('>>>[6].Predicting...')
-    pred_batch_size = 256
+    pred_batch_size = 512
     id_preds = np.load(os.path.join(test_data_path, 'targets.npy'))
     test_data, _ = data_helper.train_test_split(test_data_path, test_ratio=0)
     test_data_len = len(test_data)
@@ -77,7 +86,7 @@ def process():
         pred_steps = test_data_len // pred_batch_size + 1
     else:
         pred_steps = test_data_len // pred_batch_size
-    predicts = model.predict_generator(generate_x(test_data, x_dim=x_dim, batch_size=pred_batch_size, max_len=max_len, x_num=2), steps=pred_steps)
+    predicts = model.predict_generator(generate_x(test_data, x_dim=x_dim, batch_size=pred_batch_size, max_len=max_len, x_num=num_input), steps=pred_steps)
 
     print('>>>[7].Saving results...')
     predicts = np.array(predicts).reshape(-1)
