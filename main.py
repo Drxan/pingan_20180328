@@ -1,7 +1,7 @@
 ﻿# -*- coding:utf-8 -*-
 from pingan import data_helper, models
 from pingan.data_helper import generate_xy, generate_x
-from keras import losses
+from pingan import losses
 from keras.callbacks import EarlyStopping
 import numpy as np
 import pandas as pd

@@ -2,209 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f2a81a0c-3bf0-4a7f-bc7c-c48248690f83" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/0.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/1.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/10.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/11.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/12.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/13.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/14.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/15.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/16.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/17.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/18.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/19.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/2.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/20.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/21.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/22.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/23.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/24.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/25.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/26.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/27.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/28.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/29.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/3.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/30.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/31.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/32.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/33.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/34.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/35.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/36.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/37.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/38.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/39.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/4.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/40.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/41.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/42.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/43.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/44.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/45.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/46.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/47.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/48.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/49.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/5.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/50.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/51.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/52.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/53.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/54.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/55.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/56.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/57.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/58.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/59.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/6.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/60.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/61.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/62.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/63.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/64.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/65.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/66.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/67.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/68.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/69.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/7.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/70.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/71.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/72.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/73.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/74.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/75.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/76.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/77.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/78.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/79.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/8.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/80.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/81.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/82.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/83.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/84.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/85.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/86.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/87.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/88.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/89.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/9.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/90.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/91.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/92.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/93.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/94.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/95.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/96.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/97.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/98.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/datas/99.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/test/targets.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/0.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/1.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/10.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/11.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/12.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/13.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/14.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/15.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/16.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/17.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/18.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/19.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/2.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/20.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/21.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/22.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/23.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/24.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/25.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/26.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/27.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/28.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/29.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/3.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/30.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/31.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/32.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/33.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/34.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/35.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/36.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/37.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/38.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/39.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/4.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/40.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/41.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/42.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/43.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/44.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/45.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/46.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/47.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/48.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/49.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/5.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/50.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/51.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/52.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/53.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/54.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/55.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/56.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/57.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/58.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/59.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/6.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/60.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/61.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/62.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/63.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/64.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/65.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/66.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/67.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/68.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/69.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/7.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/70.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/71.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/72.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/73.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/74.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/75.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/76.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/77.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/78.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/79.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/8.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/80.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/81.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/82.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/83.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/84.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/85.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/86.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/87.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/88.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/89.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/9.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/90.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/91.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/92.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/93.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/94.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/95.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/96.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/97.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/98.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/datas/99.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/train/targets.npy" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/model/pred.csv" afterPath="" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pingan/losses.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main.py" afterPath="$PROJECT_DIR$/main.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pingan/__init__.py" afterPath="$PROJECT_DIR$/pingan/__init__.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -214,15 +15,15 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/Evaluation$main.coverage" NAME="main Coverage Results" MODIFIED="1522408983614" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Evaluation$main.coverage" NAME="main Coverage Results" MODIFIED="1522418876924" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file leaf-file-name="main.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
-              <caret line="20" column="3" lean-forward="true" selection-start-line="20" selection-start-column="3" selection-end-line="20" selection-end-column="3" />
+            <state relative-caret-position="378">
+              <caret line="21" column="0" lean-forward="true" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
               <folding>
                 <element signature="e#23#61#0" expanded="true" />
               </folding>
@@ -231,22 +32,12 @@
         </entry>
       </file>
       <file leaf-file-name="losses.py" pinned="false" current-in-tab="false">
-        <entry file="file:///usr/anaconda3/lib/python3.6/site-packages/keras/losses.py">
+        <entry file="file://$PROJECT_DIR$/pingan/losses.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="323">
-              <caret line="82" column="25" lean-forward="false" selection-start-line="82" selection-start-column="9" selection-end-line="82" selection-end-column="25" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/pingan/models.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="225">
-              <caret line="86" column="29" lean-forward="false" selection-start-line="86" selection-start-column="29" selection-end-line="86" selection-end-column="29" />
+            <state relative-caret-position="504">
+              <caret line="28" column="42" lean-forward="false" selection-start-line="28" selection-start-column="42" selection-end-line="28" selection-end-column="42" />
               <folding>
-                <element signature="e#0#35#0" expanded="true" />
+                <element signature="e#107#130#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -255,9 +46,23 @@
       <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pingan/__init__.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="25" lean-forward="false" selection-start-line="0" selection-start-column="25" selection-end-line="0" selection-end-column="25" />
-              <folding />
+            <state relative-caret-position="36">
+              <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#29#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pingan/models.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="279">
+              <caret line="86" column="29" lean-forward="false" selection-start-line="86" selection-start-column="29" selection-end-line="86" selection-end-column="29" />
+              <folding>
+                <element signature="e#0#35#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -277,8 +82,8 @@
       <file leaf-file-name="data_helper.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pingan/data_helper.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="533">
-              <caret line="206" column="30" lean-forward="false" selection-start-line="206" selection-start-column="30" selection-end-line="206" selection-end-column="30" />
+            <state relative-caret-position="270">
+              <caret line="45" column="57" lean-forward="false" selection-start-line="45" selection-start-column="57" selection-end-line="45" selection-end-column="57" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -321,10 +126,11 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/pingan/__init__.py" />
         <option value="$PROJECT_DIR$/pingan/data_helper_old.py" />
         <option value="$PROJECT_DIR$/pingan/data_helper.py" />
         <option value="$PROJECT_DIR$/pingan/models.py" />
+        <option value="$PROJECT_DIR$/pingan/losses.py" />
+        <option value="$PROJECT_DIR$/pingan/__init__.py" />
         <option value="$PROJECT_DIR$/main.py" />
       </list>
     </option>
@@ -336,8 +142,8 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="118" />
-    <option name="y" value="59" />
+    <option name="x" value="104" />
+    <option name="y" value="42" />
     <option name="width" value="1691" />
     <option name="height" value="935" />
   </component>
@@ -445,7 +251,8 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="118" y="59" width="1691" height="935" extended-state="0" />
+    <frame x="104" y="42" width="1691" height="935" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
@@ -478,18 +285,19 @@
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3250444" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.20230474" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2375" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19452888" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3268206" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32522407" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="SciView" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -533,7 +341,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="25" lean-forward="false" selection-start-line="0" selection-start-column="25" selection-end-line="0" selection-end-column="25" />
-          <folding />
+          <folding>
+            <element signature="e#0#29#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -597,7 +407,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="25" lean-forward="false" selection-start-line="0" selection-start-column="25" selection-end-line="0" selection-end-column="25" />
-          <folding />
+          <folding>
+            <element signature="e#0#29#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -661,7 +473,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="25" lean-forward="false" selection-start-line="0" selection-start-column="25" selection-end-line="0" selection-end-column="25" />
-          <folding />
+          <folding>
+            <element signature="e#0#29#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -701,7 +515,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="25" lean-forward="false" selection-start-line="0" selection-start-column="25" selection-end-line="0" selection-end-column="25" />
-          <folding />
+          <folding>
+            <element signature="e#0#29#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -726,14 +542,6 @@
       </provider>
     </entry>
     <entry file="file://C:/Anaconda3/Lib/datetime.py" />
-    <entry file="file://$PROJECT_DIR$/pingan/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="25" lean-forward="false" selection-start-line="0" selection-start-column="25" selection-end-line="0" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://C:/Anaconda3/Lib/site-packages/keras/layers/recurrent.py" />
     <entry file="file://C:/Anaconda3/Lib/site-packages/keras/models.py" />
     <entry file="file:///usr/anaconda3/lib/python3.6/site-packages/keras/models.py">
@@ -764,8 +572,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pingan/data_helper.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="533">
-          <caret line="206" column="30" lean-forward="false" selection-start-line="206" selection-start-column="30" selection-end-line="206" selection-end-column="30" />
+        <state relative-caret-position="270">
+          <caret line="45" column="57" lean-forward="false" selection-start-line="45" selection-start-column="57" selection-end-line="45" selection-end-column="57" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
@@ -774,23 +582,33 @@
     </entry>
     <entry file="file:///usr/anaconda3/lib/python3.6/site-packages/keras/losses.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="82" column="25" lean-forward="false" selection-start-line="82" selection-start-column="9" selection-end-line="82" selection-end-column="25" />
+        <state relative-caret-position="1260">
+          <caret line="70" column="2" lean-forward="false" selection-start-line="69" selection-start-column="0" selection-end-line="72" selection-end-column="44" />
+          <folding>
+            <element signature="e#0#38#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/anaconda3/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="143">
+          <caret line="2876" column="38" lean-forward="true" selection-start-line="2876" selection-start-column="38" selection-end-line="2876" selection-end-column="38" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/model/pred.csv">
+    <entry file="file:///usr/anaconda3/lib/python3.6/site-packages/tensorflow/python/ops/nn_impl.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1202">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="171">
+          <caret line="270" column="0" lean-forward="true" selection-start-line="270" selection-start-column="0" selection-end-line="270" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pingan/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
+        <state relative-caret-position="279">
           <caret line="86" column="29" lean-forward="false" selection-start-line="86" selection-start-column="29" selection-end-line="86" selection-end-column="29" />
           <folding>
             <element signature="e#0#35#0" expanded="true" />
@@ -798,10 +616,38 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/pingan/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="36">
+          <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#29#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pingan/losses.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="504">
+          <caret line="28" column="42" lean-forward="false" selection-start-line="28" selection-start-column="42" selection-end-line="28" selection-end-column="42" />
+          <folding>
+            <element signature="e#107#130#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/model/pred.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="20" column="3" lean-forward="true" selection-start-line="20" selection-start-column="3" selection-end-line="20" selection-end-column="3" />
+        <state relative-caret-position="378">
+          <caret line="21" column="0" lean-forward="true" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
           <folding>
             <element signature="e#23#61#0" expanded="true" />
           </folding>
