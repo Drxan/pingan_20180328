@@ -205,7 +205,7 @@ def generate_xy(data_files, target_file, x_dim, batch_size=128, max_len=128, x_n
                     k = np.random.choice(trunc_len)
                     x_values = x_values[k:x_len-trunc_len+k, :]
                 x[idx, :, :] = x_values
-                prob = 2.0 / (1+np.exp(-targets[user_idx, 1]))-1
+                prob = targets[user_idx, 1]
                 y.append(prob)
             if x_num > 1:
                 x = [x]*x_num

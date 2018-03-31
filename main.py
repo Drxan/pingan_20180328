@@ -1,7 +1,7 @@
 ﻿# -*- coding:utf-8 -*-
 from pingan import data_helper, models
 from pingan.data_helper import generate_xy, generate_x
-from pingan import losses
+from keras import losses
 from keras.callbacks import EarlyStopping
 import numpy as np
 import pandas as pd
@@ -39,7 +39,7 @@ def process():
     os.chdir(CURRENT_PATH)
 
     print('>>>[3].Split data into the train and validate...')
-    train_data, val_data = data_helper.train_test_split(train_data_path, test_ratio=0.3, random_state=9)
+    train_data, val_data = data_helper.train_test_split(train_data_path, test_ratio=0.25, random_state=9)
     target_file = os.path.join(train_data_path, 'targets.npy')
     max_len = int(np.percentile(lens, 75))
     x_dim = feature_num
@@ -47,7 +47,7 @@ def process():
     print('>>>[4].Creating model...')
     model = models.create_cnn((max_len, x_dim))
 
-    model.compile(optimizer='adam', loss=losses.cosine)
+    model.compile(optimizer='adam', loss=losses.mse)
     print(model.summary())
 
     print('val steps:', len(val_data)//BATCH_SIZE)
