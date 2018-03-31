@@ -41,7 +41,7 @@ def process():
     print('>>>[3].Split data into the train and validate...')
     train_data, val_data = data_helper.train_test_split(train_data_path, test_ratio=0.3, random_state=9)
     target_file = os.path.join(train_data_path, 'targets.npy')
-    max_len = int(np.percentile(lens, 85))
+    max_len = int(np.percentile(lens, 75))
     x_dim = feature_num
 
     print('>>>[4].Creating model...')
@@ -63,15 +63,17 @@ def process():
                                validation_data=generate_xy(val_data, target_file, x_dim, batch_size=val_batch_size, max_len=max_len, x_num=num_input),
                                validation_steps=val_steps,
                                initial_epoch=0,
-                               verbose=2)
+                              verbose=2)
+    '''
     bst_epoch = len(hist.epoch)
-
+    
     model.fit_generator(
         generate_xy(np.concatenate([train_data, val_data]), target_file, x_dim, batch_size=BATCH_SIZE, max_len=max_len, x_num=num_input),
         steps_per_epoch=max(len(train_data) // BATCH_SIZE, 1),
         epochs=bst_epoch,
         initial_epoch=0,
         verbose=2)
+    '''
 
     print('Total user count:', len(train_data) + len(val_data))
 

@@ -193,15 +193,17 @@ def generate_xy(data_files, target_file, x_dim, batch_size=128, max_len=128, x_n
             for idx, file_name in enumerate(data_files[batch:batch+batch_size]):
                 user_idx = int(os.path.split(file_name)[1].split(r'.')[0])
                 x_values = np.load(file_name)
+                x_len = x_values.shape[0]
                 # padding
-                if x_values.shape[0] < max_len:
-                    pad_len = max_len - x_values.shape[0]
+                if x_len < max_len:
+                    pad_len = max_len - x_len
                     pad_values = np.zeros((pad_len, x_dim))
                     x_values = np.concatenate([x_values, pad_values])
                 # truncating
-                if x_values.shape[0] > max_len:
-                    trunc_len = x_values.shape[0] - max_len
-                    x_values = x_values[trunc_len:, :]
+                if x_len > max_len:
+                    trunc_len = x_len - max_len
+                    k = np.random.choice(trunc_len)
+                    x_values = x_values[k:x_len-trunc_len+k, :]
                 x[idx, :, :] = x_values
                 prob = 2.0 / (1+np.exp(-targets[user_idx, 1]))-1
                 y.append(prob)
