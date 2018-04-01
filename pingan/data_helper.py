@@ -8,6 +8,9 @@ import shutil
 
 def load_data(data_path):
     df = pd.read_csv(data_path)
+    # 过滤掉方向未知或速度未知的记录，同时过滤掉高度小于-50m的记录
+    df = df.loc[(df['DIRECTION'] >= 0) & (df['SPEED'] >= 0) & (df['HEIGHT'] >= -50)]
+    df = df.drop_duplicates()
     return df
 
 
@@ -33,8 +36,8 @@ def get_time(unix_time_stamp, time_type='hour'):
 
 
 def extract_feature(data_path, data_process_params=None, target=None):
-    print('Into function "extract_feature":')
-    print('Extracting features...')
+    # print('Into function "extract_feature":')
+    # print('Extracting features...')
     df = load_data(data_path)
     print("Sorting lines by ['TERMINALNO', 'TIME']...")
     df.sort_values(by=['TERMINALNO', 'TIME'], inplace=True)
@@ -118,7 +121,7 @@ def extract_feature(data_path, data_process_params=None, target=None):
     df = df.join(dummy_feat)
 
     features.extend(dummy_feat_names)
-    print('Quit from function "extract_feature"')
+    # print('Quit from function "extract_feature"')
 
     if target is None:
         return df[['TERMINALNO']+features], features, None

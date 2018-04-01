@@ -6,11 +6,14 @@ from keras.layers.normalization import BatchNormalization
 
 def create_lstm(input_shape):
     model = Sequential()
-    model.add(LSTM(units=256, input_shape=input_shape, activation='tanh', return_sequences=True))
+    model.add(LSTM(units=128, input_shape=input_shape, activation='tanh', return_sequences=True))
+    model.add(Dropout(0.5))
     model.add(LSTM(units=128, activation='tanh', dropout=0.5))
+    model.add(BatchNormalization())
     model.add(Dense(units=128, activation='relu'))
-    model.add(Dropout(rate=0.3))
-    model.add(Dense(128, activation='relu'))
+    model.add(Dropout(rate=0.5))
+    model.add(Dense(64, activation='relu'))
+    model.add(Dense(32, activation='relu'))
     model.add(Dense(1))
     return model
 

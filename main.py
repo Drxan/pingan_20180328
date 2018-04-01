@@ -6,6 +6,7 @@ from keras.callbacks import EarlyStopping
 import numpy as np
 import pandas as pd
 import os
+import time
 from keras import metrics
 
 # ---------submit------------
@@ -24,19 +25,34 @@ CURRENT_PATH = os.getcwd()
 BATCH_SIZE = 256
 EPOCHES = 1000
 
+train_dtypes = {'TERMINALNO': 'int32',
+                'TIME': 'int32',
+                'TRIP_ID': 'uint8',
+                'LONGITUDE': 'float32',
+                'LATITUDE': 'float32',
+                'DIRECTION': 'int16',
+                'HEIGHT': 'float32',
+                'SPEED': 'float32',
+                'CALLSTATE': 'uint8',
+                'Y': 'float32'}
+
 
 def process():
 
     print('>>>[1].Preprocessing train data...')
+    start_time = time.clock()
     train_data_path = os.path.join(CURRENT_PATH, 'data/train')
+    print('time:', time.clock()-start_time)
 
     params, feature_num, lens = data_helper.prepare_data(path_train, train_data_path, target='Y')
     os.chdir(CURRENT_PATH)
 
     print('>>>[2].Preprocessing test data...')
+    start_time = time.clock()
     test_data_path = os.path.join(CURRENT_PATH, 'data/test')
     _ = data_helper.prepare_data(path_test, test_data_path, process_params=params, target=None)
     os.chdir(CURRENT_PATH)
+    print('time:', time.clock() - start_time)
 
     print('>>>[3].Split data into the train and validate...')
     train_data, val_data = data_helper.train_test_split(train_data_path, test_ratio=0.25, random_state=9)
@@ -45,10 +61,10 @@ def process():
     x_dim = feature_num
 
     print('>>>[4].Creating model...')
-    model = models.create_cnn((max_len, x_dim))
+    model = models.create_lstm((max_len, x_dim))
 
     model.compile(optimizer='adam', loss=losses.mse)
-    print(model.summary())
+    # print(model.summary())
 
     print('val steps:', len(val_data)//BATCH_SIZE)
     print('>>>[5].Training model...')
@@ -56,6 +72,7 @@ def process():
     val_batch_size = int(len(val_data)/10)
     val_steps = len(val_data)//val_batch_size
     num_input = 1
+    start_time = time.clock()
     hist = model.fit_generator(generate_xy(train_data, target_file, x_dim, batch_size=BATCH_SIZE, max_len=max_len, x_num=num_input),
                                steps_per_epoch=max(len(train_data)//BATCH_SIZE, 1),
                                epochs=EPOCHES,
@@ -64,6 +81,7 @@ def process():
                                validation_steps=val_steps,
                                initial_epoch=0,
                               verbose=2)
+    print('time:', time.clock() - start_time)
     '''
     bst_epoch = len(hist.epoch)
     
@@ -88,7 +106,10 @@ def process():
         pred_steps = test_data_len // pred_batch_size + 1
     else:
         pred_steps = test_data_len // pred_batch_size
+
+    start_time = time.clock()
     predicts = model.predict_generator(generate_x(test_data, x_dim=x_dim, batch_size=pred_batch_size, max_len=max_len, x_num=num_input), steps=pred_steps)
+    print('time:', time.clock() - start_time)
 
     print('>>>[7].Saving results...')
     predicts = np.array(predicts).reshape(-1)
