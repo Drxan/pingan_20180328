@@ -82,7 +82,7 @@ def extract_feature(raw_data_path, dtype, save_path, data_process_params=None, t
     part_num = len(users)//process_num # the user to deal for each thread
     parts = []
     for i in range(process_num-1):
-        parts.append((i,i+part_num))
+        parts.append((i, i+part_num))
     parts.append((parts[-1][1], len(users)))
 
     # multiple thread to extract the features
@@ -182,7 +182,7 @@ def extract_user_feature(udf):
     trip_features = pd.DataFrame(trip_features, columns=trip_feature_names)
 
     # 提取该用户的用户级特征，每个用户一个特征向量
-    user_feature_names = []
+    # user_feature_names = []
     user_feature = []
     # 该用户有效速度特征
     real_speeds = udf.loc[udf['SPEED'] > 0, 'SPEED']
@@ -190,21 +190,21 @@ def extract_user_feature(udf):
     user_feature.append(real_speeds.min())
     user_feature.append(real_speeds.mean())
     user_feature.append(real_speeds.std())
-    user_feature_names.extend(['max_point_speed', 'min_point_speed', 'mean_point_speed', 'std_point_speed'])
+    # user_feature_names.extend(['max_point_speed', 'min_point_speed', 'mean_point_speed', 'std_point_speed'])
 
     # 该用户驾驶时间特征
     utime = udf['TIME'].apply(get_time)
     user_feature.append(utime['hour'].value_counts().iloc[0] / 23.0)
     user_feature.append(utime['weekday'].value_counts().iloc[0] / 7.0)
     user_feature.append(trip_features['hour'].value_counts().iloc[0])
-    user_feature_names.extend(['most_hour', 'most_weekday', 'most_start_hour'])
+    # user_feature_names.extend(['most_hour', 'most_weekday', 'most_start_hour'])
 
     # 用户的位置几何中心
     loca = udf[['LONGITUDE', 'LATITUDE', 'HEIGHT']].mean()
     user_feature.append(loca['LONGITUDE'])
     user_feature.append(loca['LATITUDE'])
     user_feature.append(loca['HEIGHT'])
-    user_feature_names.extend(['central_lon', 'central_lat', 'central_height'])
+    # user_feature_names.extend(['central_lon', 'central_lat', 'central_height'])
 
     # 用户行驶中常见通话状态占比
     calls = udf.loc[udf['SPEED'] > 0, 'CALLSTATE'].value_counts()
@@ -213,7 +213,7 @@ def extract_user_feature(udf):
     for i in range(len(calls)):
         call_rate[calls.index[i]] = calls.iloc[i]
     user_feature.extend(call_rate)
-    user_feature_names.extend(['0_call', '1_call', '2_call', '3_call', '4_call'])
+    # user_feature_names.extend(['0_call', '1_call', '2_call', '3_call', '4_call'])
 
     return user_feature, trip_features
 
@@ -304,4 +304,95 @@ def extract_trip_feature(utrip):
     trip_feature.append(utrip.loc[utrip['SPEED'] > 0, 'SPEED'].std())
     # feature_names.extend(['max_point_speed','min_point_speed','mean_point_speed','std_point_speed'])
     return trip_feature
+
+
+def train_test_split(data_path, test_ratio=0.25, random_state=0):
+
+    trip_feature_path = os.path.join(data_path, 'datas')
+    data_files = np.array([os.path.join(trip_feature_path, df) for df in os.listdir(trip_feature_path)])
+    data_files.sort()
+    np.random.seed(random_state)
+    np.random.shuffle(data_files)
+    k = int(test_ratio*len(data_files))
+    train = data_files[k:]
+    test = data_files[:k]
+    return train, test
+
+
+def generate_xy(trip_feature_files, user_feature_file, target_file, x_trip_dim, x_user_dim, batch_size=128, max_len=128, x_num=1):
+
+    targets = np.load(target_file)
+    user_feats = np.load(user_feature_file)
+
+    if len(trip_feature_files) < batch_size:
+        batches = 1
+        batch_size = len(trip_feature_files)
+    else:
+        batches = len(trip_feature_files) // batch_size
+    trip_feature_files = trip_feature_files.copy()
+    while True:
+        np.random.shuffle(trip_feature_files)
+        for batch in range(batches):
+            x_trip = np.zeros((batch_size, max_len, x_trip_dim), dtype=np.float32)
+            x_user = np.zeros((batch_size, x_user_dim), dtype=np.float32)
+            y = []
+            for idx, file_name in enumerate(trip_feature_files[batch:batch+batch_size]):
+                user_idx = int(os.path.split(file_name)[1].split(r'.')[0])
+                x_user_value = user_feats[user_idx]
+                x_user[idx, :] = x_user_value
+                x_trip_values = np.load(file_name)
+                x_len = x_trip_values.shape[0]
+                # padding
+                if x_len < max_len:
+                    pad_len = max_len - x_len
+                    pad_values = np.zeros((pad_len, x_trip_dim))
+                    x_trip_values = np.concatenate([x_trip_values, pad_values])
+                # truncating
+                if x_len > max_len:
+                    trunc_len = x_len - max_len
+                    k = np.random.choice(trunc_len)
+                    x_trip_values = x_trip_values[k:x_len-trunc_len+k, :]
+                x_trip[idx, :, :] = x_trip_values
+                prob = targets[user_idx, 1]
+                y.append(prob)
+            x = [x_trip, x_user]
+            if x_num > 1:
+                x = x*x_num
+            yield x, np.array(y)
+
+
+def generate_x(trip_feature_files, user_feature_file, x_trip_dim, x_user_dim,  batch_size=128, max_len=128, x_num=1):
+
+    data_len = len(trip_feature_files)
+    user_feats = np.load(user_feature_file)
+
+    if data_len < batch_size:
+        batches = 1
+    elif (data_len % batch_size) > 0:
+        batches = data_len//batch_size+1
+    else:
+        batches = data_len//batch_size
+    while True:
+        for batch in range(batches):
+            x_trip = np.zeros((batch_size, max_len, x_trip_dim), dtype=np.float32)
+            x_user = np.zeros((batch_size, x_user_dim))
+            for idx, file_name in enumerate(trip_feature_files[batch:min(batch+batch_size, data_len)]):
+                user_idx = int(os.path.split(file_name)[1].split(r'.')[0])
+                x_user_value = user_feats[user_idx]
+                x_user[idx, :] = x_user_value
+                x_values = np.load(file_name)
+                # padding
+                if x_values.shape[0] < max_len:
+                    pad_len = max_len - x_values.shape[0]
+                    pad_values = np.zeros((pad_len, x_trip_dim))
+                    x_values = np.concatenate([x_values, pad_values])
+                # truncating
+                if x_values.shape[0] > max_len:
+                    trunc_len = x_values.shape[0] - max_len
+                    x_values = x_values[trunc_len:, :]
+                x_trip[idx, :, :] = x_values
+            x = [x_trip, x_user]
+            if x_num > 1:
+                x = x * x_num
+            yield x
 
