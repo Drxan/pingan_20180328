@@ -1,3 +1,10 @@
+#encoding:utf-8
+"""
+@project : Evaluation
+@file : data_helper_multithread
+@author : Drxan
+@create_time : 18-4-1 下午7:18
+"""
 import pandas as pd
 import numpy as np
 import datetime
@@ -5,6 +12,8 @@ from sklearn.preprocessing import OneHotEncoder
 import os
 import shutil
 import math
+import threading
+from multiprocessing import Process, Pool
 
 
 def extract_feature(raw_data_path, dtype, save_path, data_process_params=None, target=None):
@@ -64,31 +73,77 @@ def extract_feature(raw_data_path, dtype, save_path, data_process_params=None, t
 
     # (3) start to extract features
     users = df['TERMINALNO'].unique()
-    ufeatures = []
+    ufeatures = [0]*len(users)
+    lens = [0]*len(users)
     id_target = np.zeros((len(users), 2), dtype=np.float32)
+
+    process_num = 8  # total thread number
+    user_indx = np.arange(len(users))
+    part_num = len(users)//process_num # the user to deal for each thread
+    parts = []
+    for i in range(process_num-1):
+        parts.append((i,i+part_num))
+    parts.append((parts[-1][1], len(users)))
+
+    # multiple thread to extract the features
+    process_pool = Pool(process_num)
+
+    threads = []
+    for i in range(process_num):
+        process_pool.apply_async(func=extract_thread,
+                                 args=(users[parts[i][0]:parts[i][1]],
+                                       user_indx[parts[i][0]:parts[i][1]],
+                                       df, features_dir, save_path, target, i)
+                                 )
+    process_pool.close()
+    process_pool.join()
+
+    # merge the result data
+    targets = []
+    ufeats = []
     lens = []
-    for idx, uid in enumerate(users):
+    for part in range(process_num):
+        td = np.load(os.path.join(save_path, 'targets_'+str(part)+r'.npy'))
+        targets.append(td)
+        ufd = np.load(os.path.join(save_path, 'ufeatures_'+str(part)+r'.npy'))
+        ufeats.append(ufd)
+        length = np.load(os.path.join(save_path, 'lens_' + str(part) + r'.npy'))
+        lens.append(length)
+    targets = np.concatenate(targets, axis=0)
+    np.save(os.path.join(save_path, 'targets.npy'), targets)
+    ufeats = np.concatenate(ufeats, axis=0)
+    np.save(os.path.join(save_path, 'ufeatures.npy'), ufeats)
+
+    lens = np.reshape(np.concatenate(lens, axis=0), (-1))
+
+    if target is None:
+        return lens, None
+    else:
+        return lens, process_params
+
+
+def extract_thread(users, user_index, df, features_dir, ufeature_dir, target, part):
+    ufeatures = []
+    id_target = []  # np.zeros((len(users), 2), dtype=np.float32)
+    lens = []
+    for uid, idx in zip(users, user_index):
         udf = df.loc[df['TERMINALNO'] == uid]
         ufeature, utrip_features = extract_user_feature(udf)
-        lens.append(utrip_features.shape[0])
+        lens.append([utrip_features.shape[0]])
         # save trip-level features
         file_name = os.path.join(features_dir, str(idx) + r'.npy')
         np.save(file_name, utrip_features)
 
         ufeatures.append(ufeature)
-        id_target[idx, 0] = uid
-        if target is not None:
-            id_target[idx, 1] = udf[target].values[0]
+        it = [uid, 0 if target is None else udf[target].values[0]]
+        id_target.append(it)
     # save the userf features and targes file
-    user_feature_file_name = os.path.join(save_path, 'ufeatures.npy')
+    user_feature_file_name = os.path.join(ufeature_dir, 'ufeatures_'+str(part)+r'.npy')
     np.save(user_feature_file_name, np.array(ufeatures))
-    targets_file_name = os.path.join(save_path, 'targets.npy')
-    np.save(targets_file_name, id_target)
-
-    if target is None:
-        return ufeatures, lens, None
-    else:
-        return ufeatures, lens, process_params
+    targets_file_name = os.path.join(ufeature_dir, 'targets_'+str(part)+r'.npy')
+    np.save(targets_file_name, np.array(id_target))
+    lens_file_name = os.path.join(ufeature_dir, 'lens_' + str(part) + r'.npy')
+    np.save(lens_file_name, np.array(id_target))
 
 
 def get_time(unix_time_stamp):
@@ -249,3 +304,4 @@ def extract_trip_feature(utrip):
     trip_feature.append(utrip.loc[utrip['SPEED'] > 0, 'SPEED'].std())
     # feature_names.extend(['max_point_speed','min_point_speed','mean_point_speed','std_point_speed'])
     return trip_feature
+
