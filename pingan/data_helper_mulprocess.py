@@ -33,8 +33,8 @@ def extract_feature(raw_data_path, dtype, save_path, data_process_params=None, t
     if target is not None:
         positive = set(df.loc[df['Y'] > 0, 'TERMINALNO'])
         negative = set(df['TERMINALNO'])-positive
-        if len(positive) < len(negative):
-            sub_negative = np.random.choice(list(negative), len(positive), replace=False)
+        if 2*len(positive) < len(negative):
+            sub_negative = np.random.choice(list(negative), 2*len(positive), replace=False)
             sub_samples = positive | sub_negative
             df = df.loc[df['TERMINALNO'].isin(sub_samples)]
 
