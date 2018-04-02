@@ -67,28 +67,24 @@ def extract_feature(raw_data_path, dtype, save_path, data_process_params=None, t
     else:
         mean_speed = data_process_params['mean_speed']
         std_speed = data_process_params['std_speed']
-    df['SPEED'] = ((df['SPEED'] - mean_speed) / std_speed).astype(np.float32)
+    # df['SPEED'] = ((df['SPEED'] - mean_speed) / std_speed).astype(np.float32)
 
     df['DIRECTION'] = (df['DIRECTION'] / 360.0).astype(np.float32)
 
     # (3) start to extract features
     users = df['TERMINALNO'].unique()
-    ufeatures = [0]*len(users)
-    lens = [0]*len(users)
-    id_target = np.zeros((len(users), 2), dtype=np.float32)
 
     process_num = 8  # total thread number
     user_indx = np.arange(len(users))
     part_num = len(users)//process_num # the user to deal for each thread
     parts = []
     for i in range(process_num-1):
-        parts.append((i, i+part_num))
+        parts.append((i*part_num, (i+1)*part_num))
     parts.append((parts[-1][1], len(users)))
 
     # multiple thread to extract the features
     process_pool = Pool(process_num)
 
-    threads = []
     for i in range(process_num):
         process_pool.apply_async(func=extract_thread,
                                  args=(users[parts[i][0]:parts[i][1]],
@@ -243,14 +239,20 @@ def extract_trip_feature(utrip):
             i + 1]
         distance = math.sqrt((distance ** 2).sum())
         dist = dist + distance
-        mean_speed = distance / time_dur
-        speeds.extend([mean_speed] * time_dur)
         # 节点之间的高差变化
-        hdiff = (utrip['HEIGHT'].iloc[i + 1] - utrip['HEIGHT'].iloc[i]) / time_dur
-        height_diffs.extend([hdiff] * time_dur)
+        hdiff = (utrip['HEIGHT'].iloc[i + 1] - utrip['HEIGHT'].iloc[i])
         # 节点之间的方向变化（无正负之分）
-        direc_diff = abs(utrip['DIRECTION'].iloc[i + 1] - utrip['DIRECTION'].iloc[i]) / time_dur
-        direc_diffs.extend([direc_diff]*time_dur)
+        direc_diff = abs(utrip['DIRECTION'].iloc[i + 1] - utrip['DIRECTION'].iloc[i])
+
+        if time_dur == 1:
+            speeds.append(distance)
+            height_diffs.append(hdiff)
+            direc_diffs.append(direc_diff)
+        else:
+            mean_speed = distance / time_dur
+            speeds.extend([mean_speed] * time_dur)
+            height_diffs.extend([hdiff/time_dur]*time_dur)
+            direc_diffs.extend([direc_diff/time_dur]*time_dur)
 
     # 当前行程的开始时间
     dtime = datetime.datetime.fromtimestamp(utrip['TIME'].iloc[0])
@@ -301,7 +303,8 @@ def extract_trip_feature(utrip):
     trip_feature.append(utrip.loc[utrip['SPEED'] > 0, 'SPEED'].max())
     trip_feature.append(utrip.loc[utrip['SPEED'] > 0, 'SPEED'].min())
     trip_feature.append(utrip.loc[utrip['SPEED'] > 0, 'SPEED'].mean())
-    trip_feature.append(utrip.loc[utrip['SPEED'] > 0, 'SPEED'].std())
+    std_speed = utrip.loc[utrip['SPEED'] > 0, 'SPEED'].std()
+    trip_feature.append(0 if np.isnan(std_speed) else std_speed)
     # feature_names.extend(['max_point_speed','min_point_speed','mean_point_speed','std_point_speed'])
     return trip_feature
 
@@ -366,17 +369,22 @@ def generate_x(trip_feature_files, user_feature_file, x_trip_dim, x_user_dim,  b
     data_len = len(trip_feature_files)
     user_feats = np.load(user_feature_file)
 
-    if data_len < batch_size:
-        batches = 1
-    elif (data_len % batch_size) > 0:
-        batches = data_len//batch_size+1
+    base_num = data_len//batch_size
+
+    if (data_len - batch_size*base_num) > 0:
+        batches = base_num+1
     else:
-        batches = data_len//batch_size
+        batches = base_num
+
     while True:
         for batch in range(batches):
-            x_trip = np.zeros((batch_size, max_len, x_trip_dim), dtype=np.float32)
-            x_user = np.zeros((batch_size, x_user_dim))
-            for idx, file_name in enumerate(trip_feature_files[batch:min(batch+batch_size, data_len)]):
+            start = batch * batch_size
+            end = min(start + batch_size, data_len)
+            sample_counts = end - start
+            x_trip = np.zeros((sample_counts, max_len, x_trip_dim), dtype=np.float32)
+            x_user = np.zeros((sample_counts, x_user_dim))
+
+            for idx, file_name in enumerate(trip_feature_files[start:end]):
                 user_idx = int(os.path.split(file_name)[1].split(r'.')[0])
                 x_user_value = user_feats[user_idx]
                 x_user[idx, :] = x_user_value
@@ -395,4 +403,5 @@ def generate_x(trip_feature_files, user_feature_file, x_trip_dim, x_user_dim,  b
             if x_num > 1:
                 x = x * x_num
             yield x
+
 

@@ -84,6 +84,37 @@ def create_lstm_cnn(input_shape):
 
 
 def create_cnn_dense(trip_input_shape, user_input_shape):
+    # cnn part
+    trip_input = Input(shape=trip_input_shape, name='trip_feature')
+    x_trip = BatchNormalization()(trip_input)
+    x_trip = Conv1D(filters=128, kernel_size=3, padding='same', activation='relu')(x_trip)
+    x_trip = MaxPooling1D(pool_size=3)(x_trip)
+    x_trip = Dropout(0.6)(x_trip)
+    x_trip = Conv1D(filters=128, kernel_size=3, padding='same', activation='relu')(x_trip)
+    x_trip = BatchNormalization()(x_trip)
+    x_trip = MaxPooling1D(pool_size=2)(x_trip)
+    x_trip = Dropout(0.5)(x_trip)
+    x_trip = Conv1D(filters=64, kernel_size=2, padding='valid', activation='relu')(x_trip)
+    x_trip = MaxPooling1D(pool_size=K.get_variable_shape(x_trip)[1])(x_trip)
+    x_trip = Flatten()(x_trip)
+
+    # dense part
+    user_input = Input(shape=user_input_shape, name='user_feature')
+    x_user = BatchNormalization()(user_input)
+    x_user = Dense(units=64, activation='tanh')(x_user)
+
+    # merge tow parts
+    merge = concatenate([x_trip, x_user])
+    hidden = Dense(units=64, activation='relu')(merge)
+    hidden = Dense(units=32, activation='tanh')(hidden)
+    output = Dense(units=1)(hidden)
+
+    model = Model(inputs=[trip_input, user_input], outputs=output)
+
+    return model
+
+
+def create_cnn_dense1(trip_input_shape, user_input_shape):
     # trip feature input
     trip_input = Input(shape=trip_input_shape, name='trip_feature')
     x_trip = Conv1D(filters=256, kernel_size=3, padding='same', activation='relu')(trip_input)

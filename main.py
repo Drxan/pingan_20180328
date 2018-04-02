@@ -10,7 +10,7 @@ import time
 from keras import metrics
 
 # ---------submit------------
-'''
+
 path_train = '/data/dm/train.csv'
 path_test = '/data/dm/test.csv'
 path_test_out = "model/"  
@@ -19,7 +19,7 @@ path_test_out = "model/"
 path_train = '/home/yw/study/Competition/pingan/train.csv'  # 训练文件
 path_test = '/home/yw/study/Competition/pingan/test.csv'  # 测试文件
 path_test_out = "model/"
-
+'''
 
 CURRENT_PATH = os.getcwd()
 BATCH_SIZE = 256
@@ -48,7 +48,10 @@ test_dtypes = {'TERMINALNO': 'int32',
 
 
 def process():
-    '''
+    #######
+    train_data_path = os.path.join(CURRENT_PATH, 'data/train')
+    test_data_path = os.path.join(CURRENT_PATH, 'data/test')
+    ##########
     print('>>>[1].Preprocessing train data...')
     start_time = time.time()
     train_data_path = os.path.join(CURRENT_PATH, 'data/train')
@@ -62,18 +65,14 @@ def process():
     _ = data_helper_mulprocess.extract_feature(path_test, test_dtypes, test_data_path, data_process_params=params, target=None)
     os.chdir(CURRENT_PATH)
     print('time2:', time.time() - start_time)
-    max_len = int(np.percentile(lens, 80))
-    '''
-    #######
-    train_data_path = os.path.join(CURRENT_PATH, 'data/train')
-    test_data_path = os.path.join(CURRENT_PATH, 'data/test')
-    ##########
+
     print('>>>[3].Split data into the train and validate...')
     train_data, val_data = data_helper_mulprocess.train_test_split(train_data_path, test_ratio=0.25, random_state=9)
     target_file = os.path.join(train_data_path, 'targets.npy')
     train_user_feat_file = os.path.join(train_data_path, 'ufeatures.npy')
 
-    max_len =33 # int(np.percentile(lens, 80))
+    max_len = int(np.percentile(lens, 80))
+    # max_len =33 # int(np.percentile(lens, 80))
     print('max_len:', max_len)
     x_trip_dim = 29
     x_user_dim = 15
@@ -102,20 +101,18 @@ def process():
 
     print('time:', time.clock() - start_time)
 
-    print('Total user count:', len(train_data) + len(val_data))
-
     print('>>>[6].Predicting...')
     pred_batch_size = 512
-    id_preds = np.load(os.path.join(test_data_path, 'targets.npy'))
+    id_preds = (np.load(os.path.join(test_data_path, 'targets.npy'))).astype(np.float32)
     test_data, _ = data_helper_mulprocess.train_test_split(test_data_path, test_ratio=0)
     test_user_feat_file = os.path.join(test_data_path, 'ufeatures.npy')
     test_data_len = len(test_data)
-    if test_data_len < pred_batch_size:
-        pred_steps = 1
-    elif (test_data_len % pred_batch_size) > 0:
-        pred_steps = test_data_len // pred_batch_size + 1
+
+    base_step = test_data_len // pred_batch_size
+    if (test_data_len - base_step * pred_batch_size) > 0:
+        pred_steps = base_step + 1
     else:
-        pred_steps = test_data_len // pred_batch_size
+        pred_steps = base_step
 
     start_time = time.clock()
     predicts = model.predict_generator(generate_x(test_data, test_user_feat_file, x_trip_dim, x_user_dim, batch_size=pred_batch_size, max_len=max_len, x_num=num_input), steps=pred_steps)
@@ -131,6 +128,7 @@ def process():
     pred_csv['Id'] = id_preds[:, 0].astype(np.int64)
     pred_csv['Pred'] = id_preds[:, 1]
     pred_csv.to_csv(path_test_out+'pred.csv', index=False)
+
 
 if __name__ == "__main__":
     print("****************** start **********************")
