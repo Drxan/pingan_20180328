@@ -71,7 +71,7 @@ def process():
     target_file = os.path.join(train_data_path, 'targets.npy')
     train_user_feat_file = os.path.join(train_data_path, 'ufeatures.npy')
 
-    max_len = int(np.percentile(lens, 80))
+    max_len = int(np.percentile(lens, 85))
     # max_len =33 # int(np.percentile(lens, 80))
     print('max_len:', max_len)
     x_trip_dim = 29

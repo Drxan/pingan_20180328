@@ -29,6 +29,15 @@ def extract_feature(raw_data_path, dtype, save_path, data_process_params=None, t
     process_params = {}
 
     df = pd.read_csv(raw_data_path, dtype=dtype)
+    # 对训练集数据进行部分采样，提高效率
+    if target is not None:
+        positive = set(df.loc[df['Y'] > 0, 'TERMINALNO'])
+        negative = set(df['TERMINALNO'])-positive
+        if len(positive) < len(negative):
+            sub_negative = np.random.choice(list(negative), len(positive), replace=False)
+            sub_samples = positive | sub_negative
+            df = df.loc[df['TERMINALNO'].isin(sub_samples)]
+
     # (1) 过滤掉方向未知或速度未知的记录，同时过滤掉高度小于-50m的记录
     df = df.loc[(df['DIRECTION'] >= 0) & (df['SPEED'] >= 0) & (df['HEIGHT'] >= -50)].copy()
 
