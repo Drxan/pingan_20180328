@@ -32,9 +32,11 @@ def extract_feature(raw_data_path, dtype, save_path, data_process_params=None, t
     # 对训练集数据进行部分采样，提高效率
     if target is not None:
         positive = set(df.loc[df['Y'] > 0, 'TERMINALNO'])
+        print('positive num:',len(positive))
         negative = set(df['TERMINALNO'])-positive
+        print('megative num:', len(negative))
         if 2*len(positive) < len(negative):
-            sub_negative = np.random.choice(list(negative), 2*len(positive), replace=False)
+            sub_negative = set(np.random.choice(list(negative), 2*len(positive), replace=False))
             sub_samples = positive | sub_negative
             df = df.loc[df['TERMINALNO'].isin(sub_samples)]
 
