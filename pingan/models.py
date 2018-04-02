@@ -1,6 +1,7 @@
 from keras.models import Sequential, Model
 from keras.layers.recurrent import LSTM
 from keras.layers import Dense, Dropout, Conv1D, MaxPooling1D, Flatten, Merge, InputLayer, Input
+from keras.layers.merge import concatenate
 from keras.layers.normalization import BatchNormalization
 import keras.backend as K
 
@@ -83,7 +84,8 @@ def create_lstm_cnn(input_shape):
 
 
 def create_cnn_dense(trip_input_shape, user_input_shape):
-    trip_input = Input(shape=trip_input_shape,name='trip_feature')
+    # trip feature input
+    trip_input = Input(shape=trip_input_shape, name='trip_feature')
     x_trip = Conv1D(filters=256, kernel_size=3, padding='same', activation='relu')(trip_input)
     x_trip = MaxPooling1D(pool_size=3)(x_trip)
     x_trip = Dropout(0.6)(x_trip)
@@ -94,24 +96,23 @@ def create_cnn_dense(trip_input_shape, user_input_shape):
     x_trip = Conv1D(filters=128, kernel_size=2, padding='valid', activation='relu')(x_trip)
     x_trip = MaxPooling1D(pool_size=K.get_variable_shape(x_trip)[1])(x_trip)
     x_trip = Flatten()(x_trip)
+    x_trip = BatchNormalization()(x_trip)
+    
+    # user feature input
+    user_input = Input(shape=user_input_shape, name='user_feature')
+    x_user = Dense(units=128, activation='relu')(user_input)
+    x_user = BatchNormalization()(x_user)
 
-    model_dense = Sequential()
-    dense_input = InputLayer(input_shape=user_input_shape)
-    print('dense input:', model_dense.output_shape)
-    model_dense.add(dense_input)
-    model_dense.add(Dense(units=128, activation='relu'))
-    model_dense.add(Dense(units=128, activation='relu'))
-    model_dense.add(BatchNormalization())
-    model_dense.add(Dense(units=64, activation='relu'))
-    print('dense:', model_dense.output_shape)
-    # model_dense.add(Flatten())
+    merge = concatenate([x_trip, x_user])
+    drop1 = Dropout(0.5)(merge)
+    hidden1 = Dense(128, activation='relu')(drop1)
+    bn1 = BatchNormalization()(hidden1)
+    hidden2 = Dense(64, activation='relu')(bn1)
+    output = Dense(1)(hidden2)
 
-    model = Sequential()
-    model.add(Merge([model_cnn, model_dense], mode='concat'))
-    model.add(Dropout(0.5))
-    model.add(Dense(128, activation='relu'))
-    model.add(Dense(64, activation='tanh'))
-    model.add(Dense(1))
+    model = Model(inputs=[trip_input, user_input], outputs=output)
+
+    return model
 
 
 '''

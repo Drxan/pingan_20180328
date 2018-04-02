@@ -22,7 +22,7 @@ path_test_out = "model/"
 
 
 CURRENT_PATH = os.getcwd()
-BATCH_SIZE = 16
+BATCH_SIZE = 256
 EPOCHES = 1000
 
 train_dtypes = {'TERMINALNO': 'int32',
@@ -131,8 +131,6 @@ def process():
     pred_csv['Id'] = id_preds[:, 0].astype(np.int64)
     pred_csv['Pred'] = id_preds[:, 1]
     pred_csv.to_csv(path_test_out+'pred.csv', index=False)
-
-
 
 if __name__ == "__main__":
     print("****************** start **********************")
