@@ -10,7 +10,7 @@ import time
 from keras import metrics
 
 # ---------submit------------
-
+'''
 path_train = '/data/dm/train.csv'
 path_test = '/data/dm/test.csv'
 path_test_out = "model/"  
@@ -19,7 +19,7 @@ path_test_out = "model/"
 path_train = '/home/yw/study/Competition/pingan/train.csv'  # 训练文件
 path_test = '/home/yw/study/Competition/pingan/test.csv'  # 测试文件
 path_test_out = "model/"
-'''
+
 
 CURRENT_PATH = os.getcwd()
 BATCH_SIZE = 256
@@ -87,11 +87,12 @@ def process():
     print('>>>[5].Training model...')
     early_stop = EarlyStopping(monitor='val_loss', patience=5)
     val_batch_size = int(len(val_data)/10)
-    val_steps = len(val_data)//val_batch_size
+    val_steps = data_helper_mulprocess.get_step(len(val_data), val_batch_size)
+    train_steps = data_helper_mulprocess.get_step(len(train_data), BATCH_SIZE)
     num_input = 1
     start_time = time.clock()
     hist = model.fit_generator(generate_xy(train_data, train_user_feat_file, target_file, x_trip_dim, x_user_dim, batch_size=BATCH_SIZE, max_len=max_len, x_num=num_input),
-                               steps_per_epoch=max(len(train_data)//BATCH_SIZE, 1),
+                               steps_per_epoch=train_steps,
                                epochs=EPOCHES,
                                callbacks=[early_stop],
                                validation_data=generate_xy(val_data, train_user_feat_file, target_file, x_trip_dim, x_user_dim, batch_size=val_batch_size, max_len=max_len, x_num=num_input),
@@ -106,13 +107,9 @@ def process():
     id_preds = (np.load(os.path.join(test_data_path, 'targets.npy'))).astype(np.float32)
     test_data, _ = data_helper_mulprocess.train_test_split(test_data_path, test_ratio=0)
     test_user_feat_file = os.path.join(test_data_path, 'ufeatures.npy')
-    test_data_len = len(test_data)
 
-    base_step = test_data_len // pred_batch_size
-    if (test_data_len - base_step * pred_batch_size) > 0:
-        pred_steps = base_step + 1
-    else:
-        pred_steps = base_step
+    test_data_len = len(test_data)
+    pred_steps = data_helper_mulprocess.get_step(test_data_len, pred_batch_size)
 
     start_time = time.clock()
     predicts = model.predict_generator(generate_x(test_data, test_user_feat_file, x_trip_dim, x_user_dim, batch_size=pred_batch_size, max_len=max_len, x_num=num_input), steps=pred_steps)

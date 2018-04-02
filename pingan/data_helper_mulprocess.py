@@ -380,12 +380,7 @@ def generate_x(trip_feature_files, user_feature_file, x_trip_dim, x_user_dim,  b
     data_len = len(trip_feature_files)
     user_feats = np.load(user_feature_file)
 
-    base_num = data_len//batch_size
-
-    if (data_len - batch_size*base_num) > 0:
-        batches = base_num+1
-    else:
-        batches = base_num
+    batches = get_step(data_len, batch_size)
 
     while True:
         for batch in range(batches):
@@ -416,3 +411,10 @@ def generate_x(trip_feature_files, user_feature_file, x_trip_dim, x_user_dim,  b
             yield x
 
 
+def get_step(data_len, batch_size):
+    base_step = data_len // batch_size
+    if (data_len - base_step * batch_size) > 0:
+        pred_steps = base_step + 1
+    else:
+        pred_steps = base_step
+    return pred_steps
