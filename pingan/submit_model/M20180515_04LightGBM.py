@@ -21,7 +21,7 @@ from sklearn.model_selection import train_test_split
 
 
 # ---------submit------------
-
+'''
 path_train = '/data/dm/train.csv'
 path_test = '/data/dm/test.csv'
 path_test_out = "model/"  
@@ -30,7 +30,7 @@ path_test_out = "model/"
 path_train = '/home/yw/study/Competition/pingan/train.csv'  # 训练文件
 path_test = '/home/yw/study/Competition/pingan/test.csv'  # 测试文件
 path_test_out = "model/"
-'''
+
 
 train_dtypes = {'TERMINALNO': 'int32',
                 'TIME': 'int32',
@@ -207,13 +207,13 @@ feature_names=['record_num','busy_month', 'free_month', 'month_mean_num', 'month
 
 lgb_params = {'boosting_type': 'gbdt',
               'colsample_bytree': 0.8,
-              'learning_rate': 0.01,
+              'learning_rate': 0.2,
               'max_bin': 168,
               # 'max_depth': 5,
               'min_child_samples': 6,
               'min_child_weight': 0.1,
               'min_split_gain': 0.17,
-              'n_estimators': 10000,
+              'n_estimators': 100,
               'n_jobs': -1,
               'num_leaves': 9,
               'objective': 'regression',
@@ -222,6 +222,18 @@ lgb_params = {'boosting_type': 'gbdt',
               'reg_lambda': 20,
               'subsample': 0.85,
               'subsample_freq': 1}
+
+param_dist = {'colsample_bytree': [0.5, 0.6, 0.7, 0.8, 0.9],
+              'max_bin': [50, 100, 168, 200, 255],
+              # 'max_depth': 5,
+              'min_child_samples': [1, 6, 10, 20, 30, 50, 80],
+              'min_child_weight': [0.01, 0.1, 1, 2],
+              'min_split_gain': [0.01, 0.17, 0.5],
+              'num_leaves': [5, 10, 15, 20, 30, 40, 50, 60],
+              'reg_alpha': [0.005, 0.01, 0.1, 0.5, 1],
+              'reg_lambda': [0.1, 1, 5, 10, 20],
+              'subsample': [0.7, 0.8, 0.9],
+              'subsample_freq': [1, 3, 5, 8]}
 
 
 def process(CURRENT_PATH):
@@ -242,39 +254,24 @@ def process(CURRENT_PATH):
     end = time.time()
     print('time:{0}'.format((end-start)/60.0))
 
-    print('[2]>> Finding the best iteration...')
+    print('[2]>> Finding the best parameters...')
     start = time.time()
-    x_train, x_val, y_train, y_val = train_test_split(train_x, targets, test_size=0.20, random_state=9)
-
     lgbr = lgb.LGBMRegressor(**lgb_params)
+    n_iter_search = 60
+    random_search = RandomizedSearchCV(lgbr, param_distributions=param_dist, n_iter=n_iter_search,
+                                       scoring='neg_mean_squared_error', n_jobs=-1, cv=2)
 
-    lgbr.fit(x_train, y_train, eval_metric='rmse', feature_name=feature_names, categorical_feature='auto',
-             eval_set=[(x_train, y_train), (x_val, y_val)], eval_names=['train', 'val'], verbose=0, early_stopping_rounds=100)
+    random_search.fit(train_x, targets)
 
-    lgb_params['n_estimators'] = lgbr.best_iteration_
-    bst_iteration = lgbr.best_iteration_
-    print('train rmse:{0}'.format(lgbr.evals_result_['train']['rmse'][bst_iteration-1]))
-    print('val rmse:{0}'.format(lgbr.evals_result_['val']['rmse'][bst_iteration-1]))
-    print('Best iteration:{0}'.format(bst_iteration))
+    print(random_search.best_params_)
 
-    del x_train, x_val, y_train, y_val
     gc.collect()
 
     end = time.time()
     print('time:{0}'.format((end - start) / 60.0))
 
-    print('[3]>> Fitting the final model...')
-    start = time.time()
-    lgbr.fit(train_x, targets, eval_metric='rmse', feature_name=feature_names, categorical_feature='auto', verbose=0)
-
-    feat_imp = pd.Series(lgbr.feature_importances_, index=feature_names).sort_values(ascending=False)
+    feat_imp = pd.Series(random_search.best_estimator_.feature_importances_, index=feature_names).sort_values(ascending=False)
     print(feat_imp.iloc[0:10])
-
-    del train_x, targets
-    gc.collect()
-
-    end = time.time()
-    print('time:{0}'.format((end - start) / 60.0))
 
     print('[4]>> Extracting test features...')
     start = time.time()
@@ -294,7 +291,7 @@ def process(CURRENT_PATH):
 
     print('[5] Predicting...')
     start = time.time()
-    preds = lgbr.predict(test_x)
+    preds = random_search.predict(test_x)
     pred_csv = pd.DataFrame(columns=['Id', 'Pred'])
     pred_csv['Id'] = items
     pred_csv['Pred'] = preds
