@@ -5,6 +5,7 @@ from keras.layers.merge import concatenate
 from keras.layers.normalization import BatchNormalization
 import keras.backend as K
 
+
 def create_lstm(input_shape):
     model = Sequential()
     model.add(LSTM(units=128, input_shape=input_shape, activation='tanh', return_sequences=True))
