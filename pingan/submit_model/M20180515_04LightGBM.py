@@ -13,7 +13,7 @@ import datetime
 import os
 import shutil
 import math
-from sklearn.model_selection import RandomizedSearchCV
+from sklearn.decomposition import TruncatedSVD
 import gc
 from sklearn.model_selection import train_test_split
 import copy
@@ -342,7 +342,22 @@ def randomized_search(x_train, x_val, y_train, y_val, estimator, modelparams, pa
     return best_params, best_train_score, best_val_score
 
 
+def decomposition(x, n_comp=10, train=True, trunc_svd=None):
+    if train:
+        trunc_svd = TruncatedSVD(n_components=n_comp, algorithm='arpack')
+        trunc_svd.fit(x)
+    # Decomposition...
+    x_svd = pd.DataFrame(trunc_svd.transform(x))
+    x_svd.columns = ['svd_'+str(i+1) for i in range(trunc_svd.n_components)]
+    if train:
+        return x_svd, trunc_svd
+    else:
+        return x_svd
+
+
 def process(CURRENT_PATH):
+    conti_var = [c for c in feature_names if c not in cat_features]
+
     print('[1]>> Extracting train features...')
     start = time.time()
     train = pd.read_csv(path_train, dtype=train_dtypes)
@@ -356,6 +371,11 @@ def process(CURRENT_PATH):
     del train
     train_x = pd.DataFrame(train_x, columns=feature_names, dtype=np.float32)
     train_x = train_x.fillna(-1)
+    x_svd, trunc_svd = decomposition(train_x[conti_var], 66, True)
+    train_x = pd.concat((train_x[cat_features], x_svd), axis=1)
+    new_feature_names = list(train_x.columns)
+
+    del x_svd
     targets = np.array(targets, dtype=np.float32)
     x_train, x_val, y_train, y_val = train_test_split(train_x, targets, test_size=0.3, random_state=9)
     gc.collect()
@@ -366,7 +386,7 @@ def process(CURRENT_PATH):
     start = time.time()
     lgbr = lgb.LGBMRegressor(**lgb_params)
     n_iter_search = 66
-    result_params, train_score, val_score = randomized_search(x_train, x_val, y_train, y_val, lgbr, lgb_params, param_dist, feature_names, cat_features, n_iter_search)
+    result_params, train_score, val_score = randomized_search(x_train, x_val, y_train, y_val, lgbr, lgb_params, param_dist, new_feature_names, cat_features, n_iter_search)
     print('train_score:{0},val_score:{1}'.format(train_score, val_score))
     gc.collect()
     end = time.time()
@@ -378,7 +398,7 @@ def process(CURRENT_PATH):
     start = time.time()
     lgbr = lgb.LGBMRegressor(**result_params)
 
-    lgbr.fit(x_train, y_train, eval_metric='rmse', feature_name=feature_names, categorical_feature=cat_features,
+    lgbr.fit(x_train, y_train, eval_metric='rmse', feature_name=new_feature_names, categorical_feature=cat_features,
              eval_set=[(x_train, y_train), (x_val, y_val)], eval_names=['train', 'val'], verbose=0,
              early_stopping_rounds=100)
 
@@ -397,9 +417,9 @@ def process(CURRENT_PATH):
     print('[4]>> Fitting the final model...')
     print(result_params)
     lgbr = lgb.LGBMRegressor(**result_params)
-    lgbr.fit(train_x, targets, eval_metric='rmse', feature_name=feature_names, categorical_feature=cat_features, verbose=0)
+    lgbr.fit(train_x, targets, eval_metric='rmse', feature_name=new_feature_names, categorical_feature=cat_features, verbose=0)
 
-    feat_imp = pd.Series(lgbr.feature_importances_, index=feature_names).sort_values(ascending=False)
+    feat_imp = pd.Series(lgbr.feature_importances_, index=new_feature_names).sort_values(ascending=False)
     print(feat_imp.iloc[0:10])
 
     del train_x, targets
@@ -417,6 +437,8 @@ def process(CURRENT_PATH):
     del test
     test_x = pd.DataFrame(test_x, columns=feature_names, dtype=np.float32)
     test_x = test_x.fillna(-1)
+    x_svd = decomposition(test_x[conti_var], train=False, trunc_svd=trunc_svd)
+    test_x = pd.concat((test_x[cat_features], x_svd), axis=1)
     gc.collect()
 
     end = time.time()
