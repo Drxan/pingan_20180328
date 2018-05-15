@@ -13,7 +13,7 @@ import datetime
 import os
 import shutil
 from mpl_toolkits.mplot3d import axes3d
-from geopy.geocoders import Nominatim
+#from geopy.geocoders import Nominatim
 import math
 from sklearn.model_selection import RandomizedSearchCV
 import gc

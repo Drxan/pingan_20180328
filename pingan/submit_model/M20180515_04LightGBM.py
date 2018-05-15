@@ -12,12 +12,12 @@ import time
 import datetime
 import os
 import shutil
-from mpl_toolkits.mplot3d import axes3d
-from geopy.geocoders import Nominatim
 import math
 from sklearn.model_selection import RandomizedSearchCV
 import gc
 from sklearn.model_selection import train_test_split
+import copy
+from sklearn import metrics
 
 
 # ---------submit------------
@@ -27,8 +27,8 @@ path_test = '/data/dm/test.csv'
 path_test_out = "model/"  
 '''
 # --------local test---------
-path_train = '/home/yw/study/Competition/pingan/train.csv'  # 训练文件
-path_test = '/home/yw/study/Competition/pingan/test.csv'  # 测试文件
+path_train = r'D:\yuwei\study\competition\pingan/train_more.csv'  # 训练文件
+path_test = r'D:\yuwei\study\competition\pingan/test.csv'  # 测试文件
 path_test_out = "model/"
 
 
@@ -228,12 +228,33 @@ param_dist = {'colsample_bytree': [0.5, 0.6, 0.7, 0.8, 0.9],
               # 'max_depth': 5,
               'min_child_samples': [1, 6, 10, 20, 30, 50, 80],
               'min_child_weight': [0.01, 0.1, 1, 2],
-              'min_split_gain': [0.01, 0.17, 0.5],
+              'min_split_gain': [0, 0.01, 0.17, 0.5],
               'num_leaves': [5, 10, 15, 20, 30, 40, 50, 60],
               'reg_alpha': [0.005, 0.01, 0.1, 0.5, 1],
               'reg_lambda': [0.1, 1, 5, 10, 20],
               'subsample': [0.7, 0.8, 0.9],
               'subsample_freq': [1, 3, 5, 8]}
+
+
+def randomized_search(x_train, x_val, y_train, y_val, estimator, modelparams, params_dist, feature_names, iter_search=60):
+    best_model = None
+    best_val_score = 999999
+    best_params = modelparams
+    for i in range(iter_search):
+        temp_params = copy.deepcopy(modelparams)
+        for key in params_dist.keys():
+            temp_params[key] = np.random.choice(params_dist[key])
+        alg = estimator.__class__(**temp_params)
+        alg.fit(x_train, y_train, eval_metric='rmse', feature_name=feature_names, categorical_feature='auto', verbose=0)
+        preds = alg.predict(x_val)
+        val_score = np.sqrt(metrics.mean_squared_error(y_val, preds))
+        if val_score < best_val_score:
+            best_val_score = val_score
+            best_model = alg
+            best_params = temp_params
+    preds = best_model.predict(x_train)
+    best_train_score = np.sqrt(metrics.mean_squared_error(y_train, preds))
+    return best_params, best_train_score, best_val_score
 
 
 def process(CURRENT_PATH):
@@ -250,6 +271,7 @@ def process(CURRENT_PATH):
     del train
     train_x = pd.DataFrame(train_x, columns=feature_names, dtype=np.float32)
     targets = np.array(targets, dtype=np.float32)
+    x_train, x_val, y_train, y_val = train_test_split(train_x, targets, test_size=0.25, random_state=9)
     gc.collect()
     end = time.time()
     print('time:{0}'.format((end-start)/60.0))
@@ -258,22 +280,46 @@ def process(CURRENT_PATH):
     start = time.time()
     lgbr = lgb.LGBMRegressor(**lgb_params)
     n_iter_search = 60
-    random_search = RandomizedSearchCV(lgbr, param_distributions=param_dist, n_iter=n_iter_search,
-                                       scoring='neg_mean_squared_error', n_jobs=-1, cv=2)
+    result_params, train_score, val_score = randomized_search(x_train, x_val, y_train, y_val, lgbr, lgb_params, param_dist, feature_names, n_iter_search)
+    print('train_score:{0},val_score:{1}'.format(train_score, val_score))
+    gc.collect()
+    end = time.time()
+    print('time:{0}'.format((end - start) / 60.0))
 
-    random_search.fit(train_x, targets)
+    print('[3] Finding the best iteration...')
+    result_params['learning_rate'] = 0.01
+    result_params['n_estimators'] = 10000
+    start = time.time()
+    lgbr = lgb.LGBMRegressor(**result_params)
 
-    print(random_search.best_params_)
+    lgbr.fit(x_train, y_train, eval_metric='rmse', feature_name=feature_names, categorical_feature='auto',
+             eval_set=[(x_train, y_train), (x_val, y_val)], eval_names=['train', 'val'], verbose=0,
+             early_stopping_rounds=100)
 
+    result_params['n_estimators'] = lgbr.best_iteration_
+    bst_iteration = lgbr.best_iteration_
+    print('train rmse:{0}'.format(lgbr.evals_result_['train']['rmse'][bst_iteration - 1]))
+    print('val rmse:{0}'.format(lgbr.evals_result_['val']['rmse'][bst_iteration - 1]))
+    print('Best iteration:{0}'.format(bst_iteration))
+
+    del x_train, x_val, y_train, y_val
     gc.collect()
 
     end = time.time()
     print('time:{0}'.format((end - start) / 60.0))
 
-    feat_imp = pd.Series(random_search.best_estimator_.feature_importances_, index=feature_names).sort_values(ascending=False)
+    print('[4]>> Fitting the final model...')
+    print(result_params)
+    lgbr = lgb.LGBMRegressor(**result_params)
+    lgbr.fit(train_x, targets, eval_metric='rmse', feature_name=feature_names, categorical_feature='auto', verbose=0)
+
+    feat_imp = pd.Series(lgbr.feature_importances_, index=feature_names).sort_values(ascending=False)
     print(feat_imp.iloc[0:10])
 
-    print('[4]>> Extracting test features...')
+    del train_x, targets
+    gc.collect()
+
+    print('[5]>> Extracting test features...')
     start = time.time()
     test = pd.read_csv(path_test, dtype=test_dtypes)
     test_x = []
@@ -291,7 +337,7 @@ def process(CURRENT_PATH):
 
     print('[5] Predicting...')
     start = time.time()
-    preds = random_search.predict(test_x)
+    preds = lgbr.predict(test_x)
     pred_csv = pd.DataFrame(columns=['Id', 'Pred'])
     pred_csv['Id'] = items
     pred_csv['Pred'] = preds
