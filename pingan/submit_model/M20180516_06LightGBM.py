@@ -412,7 +412,7 @@ def process(CURRENT_PATH):
     print('time:{0}'.format((end - start) / 60.0))
 
     print('[3] Finding the best iteration...')
-    result_params['learning_rate'] = 0.01
+    result_params['learning_rate'] = 0.02
     result_params['n_estimators'] = 10000
     start = time.time()
     lgbr = lgb.LGBMClassifier(**result_params)
