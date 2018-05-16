@@ -278,7 +278,7 @@ cat_features = ['busy_period', 'free_period', 'busy_month', 'free_month', 'busy_
 lgb_params = {'boosting_type': 'gbdt',
               'colsample_bytree': 0.8,
               'learning_rate': 0.2,
-              'max_bin': 168,
+              'max_bin': 66,
               # 'max_depth': 5,
               'min_child_samples': 6,
               'min_child_weight': 0.1,
@@ -291,9 +291,10 @@ lgb_params = {'boosting_type': 'gbdt',
               'reg_alpha': 0.005,
               'reg_lambda': 20,
               'subsample': 0.85,
-              'subsample_freq': 1,
-              'min_data_in_bin': 1,
-              'min_data': 1}
+              'subsample_freq': 1
+              #'min_data_in_bin': 1,
+              #'min_data': 1
+              }
 
 param_dist_old = {'colsample_bytree': [0.1, 0.3, 0.5, 0.6, 0.7, 0.8, 0.9],
               'max_bin': [25, 50],  # [50, 100, 168, 200, 255]
@@ -316,8 +317,8 @@ param_dist = {'colsample_bytree': list(np.arange(0.1, 1.0, 0.05)),
               'num_leaves': list(range(3, 120, 2)),
               'reg_alpha': list(np.arange(0, 20, 0.01)),
               'reg_lambda': list(np.arange(0, 20, 0.01)),
-              'subsample': list(np.arange(0.5, 1.02, 0.02)),
-              'subsample_freq': list(range(1, 10, 1))}
+              'subsample': list(np.arange(0.5, 1, 0.02))+[1],
+              'subsample_freq': list(range(1, 6, 1))}
 
 
 def randomized_search(x_train, x_val, y_train, y_val, estimator, modelparams, params_dist, feature_names, cat_features, iter_search=60):
