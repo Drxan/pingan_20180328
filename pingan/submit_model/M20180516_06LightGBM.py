@@ -21,22 +21,23 @@ from sklearn import metrics
 from math import radians, cos, sin, asin, sqrt
 
 # ---------submit------------
-'''
+
 path_train = '/data/dm/train.csv'
 path_test = '/data/dm/test.csv'
 path_test_out = "model/"
-'''
+
 '''
 # --------local test---------
 path_train = r'D:\yuwei\study\competition\pingan/train_more.csv'  # 训练文件
 path_test = r'D:\yuwei\study\competition\pingan/test.csv'  # 测试文件
 path_test_out = "model/"
 '''
-
+'''
 # --------local test---------
 path_train = '/home/yw/study/Competition/pingan/train.csv'  # 训练文件
 path_test = '/home/yw/study/Competition/pingan/test.csv'  # 测试文件
 path_test_out = "model/"
+'''
 
 train_dtypes = {'TERMINALNO': 'int32',
                 'TIME': 'int32',
@@ -328,7 +329,8 @@ param_dist = {'colsample_bytree': list(np.arange(0.1, 1.0, 0.05)),
               'subsample_freq': list(range(1, 6, 1))}
 
 
-def randomized_search(x_train, x_val, y_train, y_val, estimator, modelparams, params_dist, feature_names, cat_features, iter_search=60):
+def randomized_search(x_train, x_val, y_train, y_val, estimator, modelparams, params_dist, feature_names, cat_features,
+                      iter_search=60, sample_weight_train=None, sample_weight_val=None):
     best_model = None
     best_val_score = -999999
     best_params = modelparams
@@ -338,17 +340,19 @@ def randomized_search(x_train, x_val, y_train, y_val, estimator, modelparams, pa
             np.random.seed(int((time.time() % 100000)*1000))
             temp_params[key] = np.random.choice(params_dist[key])
         alg = estimator.__class__(**temp_params)
-        alg.fit(x_train, y_train, eval_metric='auc', feature_name=feature_names, categorical_feature=cat_features, verbose=0)
+        alg.fit(x_train, y_train, sample_weight=sample_weight_train, eval_metric='auc', feature_name=feature_names,
+                categorical_feature=cat_features, verbose=0)
         preds = alg.predict_proba(x_val)
         preds = preds[:, 1]
-        val_score = metrics.roc_auc_score(y_val, preds)
+        print(preds)
+        val_score = metrics.roc_auc_score(y_val, preds, sample_weight=sample_weight_val)
         if val_score > best_val_score:
             best_val_score = val_score
             best_model = alg
             best_params = temp_params
     preds = best_model.predict_proba(x_train)
     preds = preds[:, 1]
-    best_train_score = metrics.roc_auc_score(y_train, preds)
+    best_train_score = metrics.roc_auc_score(y_train, preds, sample_weight=sample_weight_train)
     return best_params, best_train_score, best_val_score
 
 
@@ -372,12 +376,12 @@ def process(CURRENT_PATH):
     start = time.time()
     train = pd.read_csv(path_train, dtype=train_dtypes)
     train_x = []
-    weights = []
+    sample_weight = []
 
     for uid in train['TERMINALNO'].unique():
         term = train.loc[train['TERMINALNO'] == uid]
         train_x.append(extract_user_features(term))
-        weights.append(term['Y'].iloc[0])
+        sample_weight.append(term['Y'].iloc[0]+1)
     del train
     train_x = pd.DataFrame(train_x, columns=feature_names, dtype=np.float32)
     train_x = train_x.fillna(-1)
@@ -386,8 +390,11 @@ def process(CURRENT_PATH):
     new_feature_names = list(train_x.columns)
 
     del x_svd
-    targets = (np.array(weights) > 0).astype(np.int32)
-    x_train, x_val, y_train, y_val = train_test_split(train_x, targets, test_size=0.3, random_state=9)
+    targets = (np.array(sample_weight) > 1).astype(np.int32)
+
+    x_train, x_val, y_train, y_val, weight_train, weight_val = train_test_split(train_x, targets, sample_weight,
+                                                                                test_size=0.3, random_state=9)
+
     gc.collect()
     end = time.time()
     print('time:{0}'.format((end-start)/60.0))
@@ -395,8 +402,10 @@ def process(CURRENT_PATH):
     print('[2]>> Finding the best parameters...')
     start = time.time()
     lgbr = lgb.LGBMClassifier(**lgb_params)
-    n_iter_search = 66
-    result_params, train_score, val_score = randomized_search(x_train, x_val, y_train, y_val, lgbr, lgb_params, param_dist, new_feature_names, cat_features, n_iter_search)
+    n_iter_search = 99
+    result_params, train_score, val_score = randomized_search(x_train, x_val, y_train, y_val, lgbr, lgb_params,
+                                                              param_dist, new_feature_names, cat_features,
+                                                              n_iter_search, weight_train, weight_val)
     print('train_score:{0},val_score:{1}'.format(train_score, val_score))
     gc.collect()
     end = time.time()
@@ -408,9 +417,9 @@ def process(CURRENT_PATH):
     start = time.time()
     lgbr = lgb.LGBMClassifier(**result_params)
 
-    lgbr.fit(x_train, y_train, eval_metric='auc', feature_name=new_feature_names, categorical_feature=cat_features,
-             eval_set=[(x_train, y_train), (x_val, y_val)], eval_names=['train', 'val'], verbose=0,
-             early_stopping_rounds=100)
+    lgbr.fit(x_train, y_train, sample_weight=weight_train, eval_metric='auc', feature_name=new_feature_names,
+             categorical_feature=cat_features, eval_set=[(x_train, y_train), (x_val, y_val)], eval_sample_weight=[weight_train, weight_val],
+             eval_names=['train', 'val'], verbose=0, early_stopping_rounds=100)
 
     result_params['n_estimators'] = lgbr.best_iteration_
     bst_iteration = lgbr.best_iteration_
@@ -418,7 +427,7 @@ def process(CURRENT_PATH):
     print('val auc:{0}'.format(lgbr.evals_result_['val']['auc'][bst_iteration - 1]))
     print('Best iteration:{0}'.format(bst_iteration))
 
-    del x_train, x_val, y_train, y_val
+    del x_train, x_val, y_train, y_val, weight_train, weight_val
     gc.collect()
 
     end = time.time()
@@ -427,7 +436,8 @@ def process(CURRENT_PATH):
     print('[4]>> Fitting the final model...')
     print(result_params)
     lgbr = lgb.LGBMClassifier(**result_params)
-    lgbr.fit(train_x, targets, eval_metric='auc', feature_name=new_feature_names, categorical_feature=cat_features, verbose=0)
+    lgbr.fit(train_x, targets, sample_weight=sample_weight, eval_metric='auc', feature_name=new_feature_names,
+             categorical_feature=cat_features, verbose=0)
 
     feat_imp = pd.Series(lgbr.feature_importances_, index=new_feature_names).sort_values(ascending=False)
     print(feat_imp.iloc[0:10])

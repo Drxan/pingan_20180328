@@ -9,4 +9,6 @@ from . import dnn_old
 from . import M20180514_03LightGBM
 from . import M20180515_04LightGBM
 from . import M20180516_05LightGBM
+from . import M20180516_06LightGBM
+
 
