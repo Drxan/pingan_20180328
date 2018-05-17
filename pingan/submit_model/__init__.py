@@ -11,5 +11,6 @@ from . import M20180515_04LightGBM
 from . import M20180516_05LightGBM
 from . import M20180516_06LightGBM
 from . import M20180517_07LightGBM
+from . import M20180518_08LightGBM
 
 
