@@ -28,7 +28,7 @@ path_test_out = "model/"
 
 '''
 # --------local test---------
-path_train = r'D:\yuwei\study\competition\pingan/train_more.csv'  # 训练文件
+path_train = r'D:\yuwei\study\competition\pingan/train.csv'  # 训练文件
 path_test = r'D:\yuwei\study\competition\pingan/test.csv'  # 测试文件
 path_test_out = "model/"
 '''
@@ -334,17 +334,19 @@ def randomized_search(x_train, x_val, y_train, y_val, estimator, modelparams, pa
     best_model = None
     best_val_score = -999999
     best_params = modelparams
+    param_num = len(params_dist)
+    seeds = range(param_num)
     for i in range(iter_search):
         temp_params = copy.deepcopy(modelparams)
-        for key in params_dist.keys():
-            np.random.seed(int((time.time() % 100000)*1000))
+        for idx, key in enumerate(params_dist.keys()):
+            np.random.seed(int((time.time() % 10000)*100000)+seeds[idx]+i*param_num)
             temp_params[key] = np.random.choice(params_dist[key])
         alg = estimator.__class__(**temp_params)
         alg.fit(x_train, y_train, sample_weight=sample_weight_train, eval_metric='auc', feature_name=feature_names,
                 categorical_feature=cat_features, verbose=0)
         preds = alg.predict_proba(x_val)
         preds = preds[:, 1]
-        print(preds)
+        # print(preds)
         val_score = metrics.roc_auc_score(y_val, preds, sample_weight=sample_weight_val)
         if val_score > best_val_score:
             best_val_score = val_score
