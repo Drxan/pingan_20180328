@@ -287,16 +287,16 @@ lgb_params = {'boosting_type': 'gbdt',
               'learning_rate': 0.2,
               'max_bin': 66,
               # 'max_depth': 5,
-              'min_child_samples': 6,
-              'min_child_weight': 0.1,
-              'min_split_gain': 0.17,
-              'n_estimators': 100,
+              'min_child_samples': 1,
+              'min_child_weight': 0,
+              'min_split_gain': 0,
+              'n_estimators': 10000,
               'n_jobs': -1,
-              'num_leaves': 9,
+              'num_leaves': 32,
               'objective': 'binary',
               'random_state': 9,
-              'reg_alpha': 0.005,
-              'reg_lambda': 20,
+              'reg_alpha': 0,
+              'reg_lambda': 0,
               'subsample': 0.85,
               'subsample_freq': 1,
               'is_unbalance': True
@@ -393,13 +393,26 @@ def process(CURRENT_PATH):
     targets = (np.array(sample_weight) > 1).astype(np.int32)
 
     x_train, x_val, y_train, y_val, weight_train, weight_val = train_test_split(train_x, targets, sample_weight,
-                                                                                test_size=0.3, random_state=9)
+                                                                                test_size=0.25, stratify=targets,
+                                                                                random_state=9)
 
     gc.collect()
     end = time.time()
     print('time:{0}'.format((end-start)/60.0))
 
-    print('[2]>> Finding the best parameters...')
+    print('[2] Finding the best iteration...')
+
+    start = time.time()
+    lgbr = lgb.LGBMClassifier(**lgb_params)
+
+    lgbr.fit(x_train, y_train, sample_weight=weight_train, eval_metric='auc', feature_name=new_feature_names,
+             categorical_feature=cat_features, eval_set=[(x_val, y_val)],eval_sample_weight=[weight_val],
+             eval_names=['val'], verbose=0, early_stopping_rounds=100)
+
+    lgb_params['n_estimators'] = lgbr.best_iteration_
+    print('Best iteration:{0}'.format(lgbr.best_iteration_))
+
+    print('[3]>> Finding the best parameters...')
     start = time.time()
     lgbr = lgb.LGBMClassifier(**lgb_params)
     n_iter_search = 99
@@ -411,7 +424,7 @@ def process(CURRENT_PATH):
     end = time.time()
     print('time:{0}'.format((end - start) / 60.0))
 
-    print('[3] Finding the best iteration...')
+    print('[4] Finding the best iteration...')
     result_params['learning_rate'] = 0.02
     result_params['n_estimators'] = 10000
     start = time.time()
@@ -433,7 +446,7 @@ def process(CURRENT_PATH):
     end = time.time()
     print('time:{0}'.format((end - start) / 60.0))
 
-    print('[4]>> Fitting the final model...')
+    print('[5]>> Fitting the final model...')
     print(result_params)
     lgbr = lgb.LGBMClassifier(**result_params)
     lgbr.fit(train_x, targets, sample_weight=sample_weight, eval_metric='auc', feature_name=new_feature_names,
@@ -445,7 +458,7 @@ def process(CURRENT_PATH):
     del train_x, targets
     gc.collect()
 
-    print('[5]>> Extracting test features...')
+    print('[6]>> Extracting test features...')
     start = time.time()
     test = pd.read_csv(path_test, dtype=test_dtypes)
     test_x = []
