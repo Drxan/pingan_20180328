@@ -24,11 +24,11 @@ from math import radians, cos, sin, asin, sqrt
   去掉trip_id列,增加地理编码特征
 """
 # ---------submit------------
-'''
+
 path_train = '/data/dm/train.csv'
 path_test = '/data/dm/test.csv'
 path_test_out = "model/"
-'''
+
 
 # --------local test---------
 '''
@@ -38,11 +38,11 @@ path_test_out = "model/"
 '''
 
 # --------local test---------
-
+'''
 path_train = '/home/yw/study/Competition/pingan/train.csv'  # 训练文件
 path_test = '/home/yw/study/Competition/pingan/test.csv'  # 测试文件
 path_test_out = "model/"
-
+'''
 
 train_dtypes = {'TERMINALNO': 'int32',
                 'TIME': 'int32',
@@ -251,10 +251,14 @@ def extract_user_features(term):
     # 将经纬度取整，拼接起来作为地块编码
     term['geo_code'] = term[['LONGITUDE', 'LATITUDE']].apply(lambda p: int(p[0])*100+int(p[1]), axis=1)
     geo_sta = term['geo_code'].value_counts()
-    loc_most = geo_sta.iloc[0]
+    loc_most = geo_sta.index[0]
+    geo_sta = geo_sta / term.shape[0]
+    loc_most_freq = geo_sta.iloc[0]
+    loc_entropy = ((-1)*geo_sta*np.log2(geo_sta)).sum()
     loc_num = len(geo_sta)
 
-    features.extend([max_lon, min_lon, max_lat, min_lat, lon_ratio, lat_ratio, dis_start, loc_most, loc_num])
+
+    features.extend([max_lon, min_lon, max_lat, min_lat, lon_ratio, lat_ratio, dis_start, loc_most, loc_most_freq,loc_entropy, loc_num])
 
     return features
 
@@ -290,7 +294,7 @@ feature_names = ['record_num','busy_period', 'free_period', 'period_mean_num', '
                'hour11_height_std', 'hour12_height_std', 'hour13_height_std', 'hour14_height_std', 'hour15_height_std', 'hour16_height_std',
                'hour17_height_std', 'hour18_height_std', 'hour19_height_std', 'hour20_height_std', 'hour21_height_std', 'hour22_height_std',
                'hour23_height_std','state0_ratio', 'state1_ratio', 'state2_ratio', 'state3_ratio', 'state4_ratio','max_lon','min_lon','max_lat',
-               'min_lat','lon_ratio','lat_ratio','dis_start', 'loc_most', 'loc_num']
+               'min_lat','lon_ratio','lat_ratio','dis_start', 'loc_most','loc_most_freq', 'loc_entropy', 'loc_num']
 cat_features = ['busy_period', 'free_period', 'busy_month', 'free_month', 'busy_day', 'free_day',
                 'busy_weekday', 'free_weekday','busy_hour', 'free_hour', 'loc_most']
 lgb_params = {'boosting_type': 'gbdt',
