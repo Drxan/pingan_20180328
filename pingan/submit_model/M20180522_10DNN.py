@@ -16,14 +16,19 @@ import math
 from sklearn.decomposition import TruncatedSVD
 import gc
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder, LabelEncoder
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder, StandardScaler
 import copy
 from sklearn import metrics
 from math import radians, cos, sin, asin, sqrt
+from pingan import models
+from keras import losses
+from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau, TensorBoard
+from keras.models import load_model
 
 """
   去掉trip_id列,增加地理编码特征
 """
+model_path = 'datas/model_data/M20180522_10DNN.h5'
 # ---------submit------------
 
 path_train = '/data/dm/train.csv'
@@ -33,10 +38,11 @@ path_test_out = "model/"
 
 # --------local test---------
 '''
-path_train = r'D:\yuwei\study\competition\pingan/train_more.csv'  # 训练文件
+path_train = r'D:\yuwei\study\competition\pingan/train.csv'  # 训练文件
 path_test = r'D:\yuwei\study\competition\pingan/test.csv'  # 测试文件
 path_test_out = "model/"
 '''
+
 
 # --------local test---------
 '''
@@ -44,6 +50,8 @@ path_train = '/home/yw/study/Competition/pingan/train.csv'  # 训练文件
 path_test = '/home/yw/study/Competition/pingan/test.csv'  # 测试文件
 path_test_out = "model/"
 '''
+BATCH_SIZE = 128
+
 
 train_dtypes = {'TERMINALNO': 'int32',
                 'TIME': 'int32',
@@ -414,6 +422,7 @@ def decomposition(x, n_comp=10, train=True, trunc_svd=None):
 
 
 def process(CURRENT_PATH):
+    bst_model = os.path.join(CURRENT_PATH, model_path)
     conti_features = [c for c in features if c not in cat_features]
     print('[1]>> Extracting train features...')
     start = time.time()
@@ -427,85 +436,40 @@ def process(CURRENT_PATH):
         train_x.append(extract_user_features(term))
         targets.append(term['Y'].iloc[0])
     del train
+
+    targets = np.array(targets)
     train_x = pd.DataFrame(train_x, columns=features, dtype=np.float32)
     train_x = train_x.fillna(-1)
 
+    # get one-hot encoding for categorical features
     dummy_feats, transformers = get_feature_dummies(train_x[cat_features], cat_features, transformer=None)
 
     train_x = pd.concat([train_x[conti_features], dummy_feats], axis=1)
 
-    # conti_var = [c for c in select_features if c not in select_cat_features]
-    # x_svd, trunc_svd = decomposition(train_x[conti_var], 66, True)
-    #train_x = pd.concat((train_x[cat_features], x_svd), axis=1)
-    new_feature_names = list(train_x.columns)
-
-    #del x_svd
-
-    x_train, x_val, y_train, y_val = train_test_split(train_x, targets, test_size=0.25, random_state=9)
+    # normalization data
+    stder = StandardScaler()
+    train_x = stder.fit_transform(train_x)
+    print(train_x.shape)
+    # x_train, x_val, y_train, y_val = train_test_split(train_x, targets, test_size=0.25, random_state=9)
 
     gc.collect()
     end = time.time()
     print('time:{0}'.format((end-start)/60.0))
 
-    print('[2] Finding the best iteration...')
+    print('[2] Creating model...')
+    model = models.create_dense((train_x.shape[1],))
+    model.compile(optimizer='adam', loss=losses.mse)
+    print(model.summary())
 
-    start = time.time()
-    lgbr = lgb.LGBMRegressor(**lgb_params)
+    print('[3] Training model,find the best model...')
+    early_stop = EarlyStopping(monitor='val_loss', patience=20, verbose=1, mode='auto')
+    check_point = ModelCheckpoint(bst_model, 'val_loss', verbose=1, save_best_only=True)
+    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=1 / math.e, verbose=1, patience=5, min_lr=0.0001)
+    #tensor_board = TensorBoard(log_dir=data_dirs['logs_path'], histogram_freq=0, write_graph=True, write_images=True)
+    train_hist = model.fit(train_x, targets, batch_size=BATCH_SIZE, epochs=1000, validation_split=0.25,
+                           callbacks=[early_stop, check_point, reduce_lr])
 
-    lgbr.fit(x_train, y_train, eval_metric='mse', feature_name=new_feature_names,
-             categorical_feature='auto', eval_set=[(x_val, y_val)],
-             eval_names=['val'], verbose=0, early_stopping_rounds=100)
-
-    lgb_params['n_estimators'] = lgbr.best_iteration_
-    print('Best iteration:{0}'.format(lgbr.best_iteration_))
-
-    print('[3]>> Finding the best parameters...')
-    start = time.time()
-    lgbr = lgb.LGBMRegressor(**lgb_params)
-    n_iter_search = 99
-    result_params, train_score, val_score = randomized_search(x_train, x_val, y_train, y_val, lgbr, lgb_params,
-                                                              param_dist, new_feature_names, 'auto',
-                                                              n_iter_search)
-    print('train_score:{0},val_score:{1}'.format(train_score, val_score))
-    gc.collect()
-    end = time.time()
-    print('time:{0}'.format((end - start) / 60.0))
-
-    print('[4] Finding the best iteration...')
-    result_params['learning_rate'] = 0.02
-    result_params['n_estimators'] = 10000
-    start = time.time()
-    lgbr = lgb.LGBMRegressor(**result_params)
-
-    lgbr.fit(x_train, y_train, eval_metric='mse', feature_name=new_feature_names,
-             categorical_feature='auto', eval_set=[(x_train, y_train), (x_val, y_val)],
-             eval_names=['train', 'val'], verbose=0, early_stopping_rounds=100)
-
-    result_params['n_estimators'] = lgbr.best_iteration_
-    bst_iteration = lgbr.best_iteration_
-    print('train mse:{0}'.format(lgbr.evals_result_['train']['l2'][bst_iteration - 1]))
-    print('val mse:{0}'.format(lgbr.evals_result_['val']['l2'][bst_iteration - 1]))
-    print('Best iteration:{0}'.format(bst_iteration))
-
-    del x_train, x_val, y_train, y_val
-    gc.collect()
-
-    end = time.time()
-    print('time:{0}'.format((end - start) / 60.0))
-
-    print('[5]>> Fitting the final model...')
-    print(result_params)
-    lgbr = lgb.LGBMRegressor(**result_params)
-    lgbr.fit(train_x, targets, eval_metric='mse', feature_name=new_feature_names,
-             categorical_feature='auto', verbose=0)
-
-    feat_imp = pd.Series(lgbr.feature_importances_, index=new_feature_names).sort_values(ascending=False)
-    print(feat_imp.iloc[0:20])
-
-    del train_x, targets
-    gc.collect()
-
-    print('[6]>> Extracting test features...')
+    print('[4]>> Extracting test features...')
     start = time.time()
     test = pd.read_csv(path_test, dtype=test_dtypes)
     test.drop('TRIP_ID', inplace=True, axis=1)
@@ -521,16 +485,17 @@ def process(CURRENT_PATH):
     dummy_feats, transformers = get_feature_dummies(test_x[cat_features], cat_features, transformer=transformers)
 
     test_x = pd.concat([test_x[conti_features], dummy_feats], axis=1)
-    # x_svd = decomposition(test_x[conti_var], train=False, trunc_svd=trunc_svd)
-    #test_x = pd.concat((test_x[cat_features], x_svd), axis=1)
-    gc.collect()
+    test_x = stder.transform(test_x)
 
+    gc.collect()
     end = time.time()
     print('time:{0}'.format((end - start) / 60.0))
 
     print('[5] Predicting...')
     start = time.time()
-    preds = lgbr.predict(test_x)
+    model = load_model(bst_model)
+    preds = model.predict(test_x)
+    preds =preds.reshape(-1)
     pred_csv = pd.DataFrame(columns=['Id', 'Pred'])
     pred_csv['Id'] = items
     pred_csv['Pred'] = preds

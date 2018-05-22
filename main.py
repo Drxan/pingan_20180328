@@ -16,4 +16,4 @@ CURRENT_PATH = os.getcwd()
 
 if __name__ == "__main__":
     print("****************** start **********************")
-    submit_model.M20180519_09LightGBM.process(CURRENT_PATH)
+    submit_model.M20180522_10DNN.process(CURRENT_PATH)
