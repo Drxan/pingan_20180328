@@ -459,7 +459,7 @@ def process(CURRENT_PATH):
     print('[2] Creating model...')
     model = models.create_dense((train_x.shape[1],))
     model.compile(optimizer='adam', loss=losses.mse)
-    print(model.summary())
+    # print(model.summary())
 
     print('[3] Training model,find the best model...')
     early_stop = EarlyStopping(monitor='val_loss', patience=20, verbose=1, mode='auto')
