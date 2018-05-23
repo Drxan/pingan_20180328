@@ -4,6 +4,7 @@ from keras.layers import Dense, Dropout, Conv1D, MaxPooling1D, Flatten, Merge, I
 from keras.layers.merge import concatenate
 from keras.layers.normalization import BatchNormalization
 import keras.backend as K
+from keras import initializers
 
 
 def create_lstm(input_shape):
@@ -85,13 +86,21 @@ def create_lstm_cnn(input_shape):
 
 def create_dense(user_input_shape):
     user_input = Input(shape=user_input_shape, name='user_feature')
-    x_user = BatchNormalization()(user_input)
-    x_user = Dense(units=512, activation='tanh')(x_user)
-    x_user = Dense(units=512, activation='tanh')(x_user)
-    x_user = Dense(units=256, activation='tanh')(x_user)
-    out_put = Dense(units=1)(x_user)
+    x_user = Dense(units=256, activation='tanh',
+                   kernel_initializer=initializers.glorot_normal(seed=9))(user_input)
+    x_user = BatchNormalization()(x_user)
+    x_user = Dense(units=256, activation='tanh',
+                   kernel_initializer=initializers.glorot_normal(seed=9))(x_user)
+    x_user = Dense(units=512, activation='tanh',
+                   kernel_initializer=initializers.glorot_normal(seed=9))(x_user)
+    x_user = BatchNormalization()(x_user)
+    x_user = Dense(units=256, activation='tanh',
+                   kernel_initializer=initializers.glorot_normal(seed=9))(x_user)
+    out_put = Dense(units=1,
+                    kernel_initializer=initializers.glorot_normal(seed=9))(x_user)
     model = Model(inputs=user_input, outputs=out_put)
     return model
+
 
 def create_cnn_dense(trip_input_shape, user_input_shape):
     # cnn part

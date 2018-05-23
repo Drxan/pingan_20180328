@@ -26,7 +26,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau, T
 from keras.models import load_model
 
 """
-  三折交叉验证训练，预测结果取平均
+  增加加速度相关特征
 """
 model_path = 'datas/model_data/M20180522_10DNN.h5'
 # ---------submit------------
@@ -108,9 +108,15 @@ def haversine1(lon1, lat1, lon2, lat2):  # 经度1，纬度1，经度2，纬度2
     return c * r * 1000
 
 
+def get_direction_diff(x):
+    t=np.abs(x)
+    return t if t<=180 else 360-t
+
+
 def extract_user_features(term):
     term = term.loc[term['SPEED'] >= 0]
     term = term.drop_duplicates()
+    term = term.sort_values(by='TIME')
     features = []
 
     # [1] 行程量统计量
@@ -252,7 +258,6 @@ def extract_user_features(term):
     time_dur = (term['TIME'].max() - term['TIME'].min()) / 3600.0+1.0
     lon_ratio = (max_lon - min_lon) / time_dur
     lat_ratio = (max_lat - min_lat) / time_dur
-    term = term.sort_values(by='TIME')
     startlong = term.iloc[0]['LONGITUDE']
     startlat = term.iloc[0]['LATITUDE']
     dis_start = haversine1(startlong, startlat, 113.9177317, 22.54334333)  # 距离某一点的距离
@@ -269,6 +274,14 @@ def extract_user_features(term):
 
     features.extend([max_lon, min_lon, max_lat, min_lat, lon_ratio, lat_ratio, dis_start, loc_most, loc_most_freq,loc_entropy, loc_num])
 
+    # 加速度相关特征
+    diff_values = term[['TIME', 'SPEED', 'DIRECTION']].astype(np.float64).diff(1, axis=0)
+    diff_values.columns = [c + "_diff" for c in diff_values.columns]
+    term = pd.concat([term, diff_values], axis=1)
+    term = term.loc[(term['TIME_diff'] > 0) & (term['TIME_diff'] <= 60)]
+    # term['DIRECTION_diff'] = term['DIRECTION_diff'].apply(get_direction_diff)
+    acc_sta = term.loc[term['SPEED'] >= 0, 'SPEED_diff'].describe()
+    features.extend(acc_sta.iloc[1:])
     return features
 
 
@@ -303,7 +316,8 @@ features = ['record_num', 'busy_period', 'free_period', 'period_mean_num', 'peri
             'hour11_height_std', 'hour12_height_std', 'hour13_height_std', 'hour14_height_std', 'hour15_height_std', 'hour16_height_std',
             'hour17_height_std', 'hour18_height_std', 'hour19_height_std', 'hour20_height_std', 'hour21_height_std', 'hour22_height_std',
             'hour23_height_std', 'state0_ratio', 'state1_ratio', 'state2_ratio', 'state3_ratio', 'state4_ratio', 'max_lon', 'min_lon', 'max_lat',
-            'min_lat', 'lon_ratio', 'lat_ratio', 'dis_start', 'loc_most', 'loc_most_freq', 'loc_entropy', 'loc_num']
+            'min_lat', 'lon_ratio', 'lat_ratio', 'dis_start', 'loc_most', 'loc_most_freq', 'loc_entropy', 'loc_num','acc_mean','acc_std','acc_min',
+            'acc_25%','acc_50%','acc_75%','acc_max']
 cat_features = ['busy_period', 'free_period', 'busy_month', 'free_month', 'busy_day', 'free_day',
                 'busy_weekday', 'free_weekday','busy_hour', 'free_hour', 'loc_most']
 
