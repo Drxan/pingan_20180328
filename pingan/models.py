@@ -84,6 +84,7 @@ def create_lstm_cnn(input_shape):
     return model
 """
 
+
 def create_dense(user_input_shape):
     user_input = Input(shape=user_input_shape, name='user_feature')
     x_user = Dense(units=256, activation='tanh',

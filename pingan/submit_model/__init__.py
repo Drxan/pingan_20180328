@@ -15,5 +15,7 @@ from . import M20180518_08LightGBM
 from . import M20180519_09LightGBM
 from . import M20180522_10DNN
 from . import M20180523_11DNN
+from . import M20180524_12DNN
+
 
 
