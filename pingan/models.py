@@ -103,6 +103,24 @@ def create_dense(user_input_shape):
     return model
 
 
+def create_dense_cat(user_input_shape, num_class):
+    user_input = Input(shape=user_input_shape, name='user_feature')
+    x_user = Dense(units=256, activation='tanh',
+                   kernel_initializer=initializers.glorot_normal(seed=9))(user_input)
+    x_user = BatchNormalization()(x_user)
+    x_user = Dense(units=256, activation='tanh',
+                   kernel_initializer=initializers.glorot_normal(seed=9))(x_user)
+    x_user = Dense(units=512, activation='tanh',
+                   kernel_initializer=initializers.glorot_normal(seed=9))(x_user)
+    x_user = BatchNormalization()(x_user)
+    x_user = Dense(units=256, activation='tanh',
+                   kernel_initializer=initializers.glorot_normal(seed=9))(x_user)
+    out_put = Dense(units=num_class, activation='softmax',
+                    kernel_initializer=initializers.glorot_normal(seed=9))(x_user)
+    model = Model(inputs=user_input, outputs=out_put)
+    return model
+
+
 def create_cnn_dense(trip_input_shape, user_input_shape):
     # cnn part
     trip_input = Input(shape=trip_input_shape, name='trip_feature')

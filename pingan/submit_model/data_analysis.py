@@ -1,10 +1,12 @@
 #encoding:utf-8
 """
 @project : Evaluation
-@file : 20180514_02LightGBM
+@file : data_analysis
 @author : Drxan
-@create_time : 18-5-14 下午7:38
+@create_time : 18-5-25 上午7:04
 """
+
+
 import pandas as pd
 import numpy as np
 import lightgbm as lgb
@@ -20,36 +22,21 @@ from sklearn.preprocessing import OneHotEncoder, LabelEncoder, StandardScaler
 import copy
 from sklearn import metrics
 from math import radians, cos, sin, asin, sqrt
-from pingan import models
 from keras import losses
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau, TensorBoard
 from keras.models import load_model
-
-"""
-  增加加速度相关特征
-"""
-model_path = 'datas/model_data/M20180522_10DNN.h5'
-# ---------submit------------
-
-path_train = '/data/dm/train.csv'
-path_test = '/data/dm/test.csv'
-path_test_out = "model/"
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn import manifold
+from matplotlib import offsetbox
+from mpl_toolkits.mplot3d import Axes3D
+#%matplotlib inline
 
 
-# --------local test---------
-'''
-path_train = r'D:\yuwei\study\competition\pingan/train.csv'  # 训练文件
-path_test = r'D:\yuwei\study\competition\pingan/test.csv'  # 测试文件
-path_test_out = "model/"
-'''
-
-
-# --------local test---------
-'''
 path_train = '/home/yw/study/Competition/pingan/train.csv'  # 训练文件
 path_test = '/home/yw/study/Competition/pingan/test.csv'  # 测试文件
 path_test_out = "model/"
-'''
+
 
 BATCH_SIZE = 16
 KFOLD = 3
@@ -364,107 +351,70 @@ def decomposition(x, n_comp=10, train=True, trunc_svd=None):
         return x_svd
 
 
-def process(CURRENT_PATH):
-    bst_model = os.path.join(CURRENT_PATH, model_path)
-    conti_features = [c for c in features if c not in cat_features]
-    print('[1]>> Extracting train features...')
-    start = time.time()
-    train = pd.read_csv(path_train, dtype=train_dtypes)
-    train.drop('TRIP_ID', inplace=True, axis=1)
-    train_x = []
-    targets = []
+conti_features = [c for c in features if c not in cat_features]
+print('[1]>> Extracting train features...')
+start = time.time()
+train = pd.read_csv(path_train, dtype=train_dtypes)
+train.drop('TRIP_ID', inplace=True, axis=1)
+train_x = []
+targets = []
 
-    for uid in train['TERMINALNO'].unique():
-        term = train.loc[train['TERMINALNO'] == uid]
-        train_x.append(extract_user_features(term))
-        targets.append(term['Y'].iloc[0])
-    del train
-    print('percentiles:', np.percentile(targets, range(5, 101, 5)))
+for uid in train['TERMINALNO'].unique():
+    term = train.loc[train['TERMINALNO'] == uid]
+    train_x.append(extract_user_features(term))
+    targets.append(term['Y'].iloc[0])
+del train
 
-    targets = np.array(targets)
-    targets = np.log10(1+targets)
-    train_x = pd.DataFrame(train_x, columns=features, dtype=np.float32)
-    train_x = train_x.fillna(-1)
+train_x = pd.DataFrame(train_x, columns=features, dtype=np.float32)
+train_x = train_x.fillna(-1)
 
-    # get one-hot encoding for categorical features
-    dummy_feats, transformers = get_feature_dummies(train_x[cat_features], cat_features, transformer=None)
+# get one-hot encoding for categorical features
+dummy_feats, transformers = get_feature_dummies(train_x[cat_features], cat_features, transformer=None)
 
-    train_x = pd.concat([train_x[conti_features], dummy_feats], axis=1)
-    column_names = train_x.columns
-    # normalization data
-    stder = StandardScaler()
-    train_x = pd.DataFrame(stder.fit_transform(train_x), columns=column_names, dtype=np.float32)
-    x_dim = train_x.shape[1]
-    gc.collect()
-    # x_train, x_val, y_train, y_val = train_test_split(train_x, targets, test_size=0.25, random_state=9)
-    end = time.time()
-    print('time:{0}'.format((end-start)/60.0))
+train_x = pd.concat([train_x[conti_features], dummy_feats], axis=1)
+column_names = train_x.columns
+# normalization data
+stder = StandardScaler()
+train_x = pd.DataFrame(stder.fit_transform(train_x), columns=column_names, dtype=np.float32)
 
-    print('[2] Training model,find the best model...')
-    start = time.time()
-    early_stop = EarlyStopping(monitor='val_loss', patience=30, verbose=0, mode='auto')
-    check_point = ModelCheckpoint(bst_model, 'val_loss', verbose=0, save_best_only=True)
-    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, verbose=0, patience=10, min_lr=0.000001)
-    #tensor_board = TensorBoard(log_dir=data_dirs['logs_path'], histogram_freq=0, write_graph=True, write_images=True)
-    train_x['Y'] = targets
-    idxs = np.arange(train_x.shape[0])
-    cv_models = []
-    cv_train_loss = []
-    cv_val_loss = []
-    cv_bst_epoch = []
-    for i in range(KFOLD):
-        model = models.create_dense((x_dim,))
-        model.compile(optimizer='adam', loss=losses.mse)
-        # print('CV {0}...'.format(i+1))
-        np.random.seed(i+9)
-        np.random.shuffle(idxs)
-        train_hist = model.fit(train_x[column_names].iloc[idxs], train_x['Y'].iloc[idxs], batch_size=BATCH_SIZE, epochs=1000,
-                               validation_split=0.25, callbacks=[early_stop, check_point, reduce_lr], verbose=0)
-        bst_epoch = np.argmin(train_hist.history['val_loss'])+1
-        cv_bst_epoch.append(bst_epoch)
-        cv_train_loss.append(train_hist.history['loss'][bst_epoch - 1])
-        cv_val_loss.append(train_hist.history['val_loss'][bst_epoch-1])
-        cv_models.append(load_model(bst_model))
 
-    print('Best epoch:', cv_bst_epoch)
-    print('val_loss:', cv_val_loss)
-    print('train_loss:', cv_train_loss)
-    end = time.time()
-    print('time:{0}'.format((end - start) / 60.0))
+def plot_embedding(X, targets=None, title=None):
+    x_min, x_max = np.min(X, 0), np.max(X, 0)
+    X = (X - x_min) / (x_max - x_min)
+    y=np.array(targets)
+    y = (y*100).astype(int)
+    plt.figure()
+    ax = plt.subplot(111)
+    for i in range(X.shape[0]):
+        plt.text(X[i, 0], X[i, 1], str(targets[i]),
+                 color=plt.cm.Set1(y[i] / 10.),
+                 fontdict={'weight': 'bold', 'size': 9})
+    plt.xticks([]), plt.yticks([])
+    if title is not None:
+        plt.title(title)
+    plt.show()
 
-    print('[3]>> Extracting test features...')
-    start = time.time()
-    test = pd.read_csv(path_test, dtype=test_dtypes)
-    test.drop('TRIP_ID', inplace=True, axis=1)
-    test_x = []
-    items = []
-    for uid in test['TERMINALNO'].unique():
-        term = test.loc[test['TERMINALNO'] == uid]
-        test_x.append(extract_user_features(term))
-        items.append(uid)
-    del test
-    test_x = pd.DataFrame(test_x, columns=features, dtype=np.float32)
-    test_x = test_x.fillna(-1)
-    dummy_feats, transformers = get_feature_dummies(test_x[cat_features], cat_features, transformer=transformers)
 
-    test_x = pd.concat([test_x[conti_features], dummy_feats], axis=1)
-    test_x = stder.transform(test_x)
+def plot_embedding_3d(X, targets=None, title=None):
+    #坐标缩放到[0,1]区间
+    x_min, x_max = np.min(X,axis=0), np.max(X,axis=0)
+    X = (X - x_min) / (x_max - x_min)
+    y=np.array(targets)
+    y = (y*100).astype(int)
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1, projection='3d')
+    for i in range(X.shape[0]):
+        ax.text(X[i, 0], X[i, 1], X[i,2], str(targets[i]), color=plt.cm.Set1(y[i] / 10.),
+                fontdict={'weight': 'bold', 'size': 9})
+    if title is not None:
+        plt.title(title)
+    plt.show()
 
-    gc.collect()
-    end = time.time()
-    print('time:{0}'.format((end - start) / 60.0))
+print("Computing t-SNE embedding")
+tsne = manifold.TSNE(n_components=3, init='pca', random_state=9)
+t0 = time.time()
+X_tsne = tsne.fit_transform(train_x)
 
-    print('[4] Predicting...')
-    preds = np.zeros(test_x.shape[0], dtype=np.float32)
-    start = time.time()
-    for model in cv_models:
-        cv_pred = model.predict(test_x)
-        cv_pred = cv_pred.reshape(-1)
-        preds = preds+cv_pred
-    preds = preds/3.0
-    pred_csv = pd.DataFrame(columns=['Id', 'Pred'])
-    pred_csv['Id'] = items
-    pred_csv['Pred'] = preds
-    pred_csv.to_csv(os.path.join(CURRENT_PATH, path_test_out + 'pred.csv'), index=False)
-    end = time.time()
-    print('time:{0}'.format((end - start) / 60.0))
+plot_embedding_3d(X_tsne,targets,
+               "t-SNE embedding of the X (time %.2fs)" %
+               (time.time() - t0))

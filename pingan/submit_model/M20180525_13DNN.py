@@ -24,6 +24,8 @@ from pingan import models
 from keras import losses
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau, TensorBoard
 from keras.models import load_model
+from keras.utils.np_utils import to_categorical
+
 
 """
   增加加速度相关特征
@@ -45,11 +47,11 @@ path_test_out = "model/"
 
 
 # --------local test---------
-'''
+
 path_train = '/home/yw/study/Competition/pingan/train.csv'  # 训练文件
 path_test = '/home/yw/study/Competition/pingan/test.csv'  # 测试文件
 path_test_out = "model/"
-'''
+
 
 BATCH_SIZE = 16
 KFOLD = 3
@@ -379,10 +381,12 @@ def process(CURRENT_PATH):
         train_x.append(extract_user_features(term))
         targets.append(term['Y'].iloc[0])
     del train
-    print('percentiles:', np.percentile(targets, range(5, 101, 5)))
 
-    targets = np.array(targets)
-    targets = np.log10(1+targets)
+    targets = pd.cut(targets, [-0.1, 0.45, 1.38, 1000], labels=False)
+    num_class = max(targets)+1
+    label_names = ['label_'+str(i) for i in range(num_class)]
+    targets = pd.DataFrame(to_categorical(targets), columns=label_names)
+
     train_x = pd.DataFrame(train_x, columns=features, dtype=np.float32)
     train_x = train_x.fillna(-1)
 
@@ -406,19 +410,19 @@ def process(CURRENT_PATH):
     check_point = ModelCheckpoint(bst_model, 'val_loss', verbose=0, save_best_only=True)
     reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, verbose=0, patience=10, min_lr=0.000001)
     #tensor_board = TensorBoard(log_dir=data_dirs['logs_path'], histogram_freq=0, write_graph=True, write_images=True)
-    train_x['Y'] = targets
+
     idxs = np.arange(train_x.shape[0])
     cv_models = []
     cv_train_loss = []
     cv_val_loss = []
     cv_bst_epoch = []
     for i in range(KFOLD):
-        model = models.create_dense((x_dim,))
-        model.compile(optimizer='adam', loss=losses.mse)
+        model = models.create_dense_cat((x_dim,), num_class)
+        model.compile(optimizer='adam', loss=losses.categorical_crossentropy)
         # print('CV {0}...'.format(i+1))
         np.random.seed(i+9)
         np.random.shuffle(idxs)
-        train_hist = model.fit(train_x[column_names].iloc[idxs], train_x['Y'].iloc[idxs], batch_size=BATCH_SIZE, epochs=1000,
+        train_hist = model.fit(train_x[column_names].iloc[idxs], targets.iloc[idxs], batch_size=BATCH_SIZE, epochs=1000,
                                validation_split=0.25, callbacks=[early_stop, check_point, reduce_lr], verbose=0)
         bst_epoch = np.argmin(train_hist.history['val_loss'])+1
         cv_bst_epoch.append(bst_epoch)
