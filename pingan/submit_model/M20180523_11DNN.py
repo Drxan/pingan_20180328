@@ -50,7 +50,7 @@ path_train = '/home/yw/study/Competition/pingan/train.csv'  # 训练文件
 path_test = '/home/yw/study/Competition/pingan/test.csv'  # 测试文件
 path_test_out = "model/"
 '''
-BATCH_SIZE = 64
+BATCH_SIZE = 16
 KFOLD = 3
 
 train_dtypes = {'TERMINALNO': 'int32',
