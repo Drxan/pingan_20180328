@@ -29,5 +29,19 @@ def cosine_proximity(y_true, y_pred):
     y_pred = l2_normalize(y_pred, axis=-1)
     return -K.mean(y_true * y_pred, axis=-1)
 
+def softmax(x, axis=-1):
+    """Softmax of a tensor.
+
+    # Arguments
+        x: A tensor or variable.
+        axis: The dimension softmax would be performed on.
+            The default is -1 which indicates the last dimension.
+
+    # Returns
+        A tensor.
+    """
+    return tf.nn.softmax(x, dim=axis)
+
 
 cosine = cosine_proximity
+soft_max = softmax

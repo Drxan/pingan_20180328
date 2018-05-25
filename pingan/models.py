@@ -5,6 +5,7 @@ from keras.layers.merge import concatenate
 from keras.layers.normalization import BatchNormalization
 import keras.backend as K
 from keras import initializers
+from pingan import losses
 
 
 def create_lstm(input_shape):
@@ -115,7 +116,7 @@ def create_dense_cat(user_input_shape, num_class):
     x_user = BatchNormalization()(x_user)
     x_user = Dense(units=256, activation='tanh',
                    kernel_initializer=initializers.glorot_normal(seed=9))(x_user)
-    out_put = Dense(units=num_class, activation='softmax',
+    out_put = Dense(units=num_class, activation=losses.soft_max,
                     kernel_initializer=initializers.glorot_normal(seed=9))(x_user)
     model = Model(inputs=user_input, outputs=out_put)
     return model
