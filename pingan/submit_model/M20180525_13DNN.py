@@ -47,13 +47,13 @@ path_test_out = "model/"
 
 
 # --------local test---------
-
+'''
 path_train = '/home/yw/study/Competition/pingan/train.csv'  # 训练文件
 path_test = '/home/yw/study/Competition/pingan/test.csv'  # 测试文件
 path_test_out = "model/"
+'''
 
-
-BATCH_SIZE = 16
+BATCH_SIZE = 32
 KFOLD = 3
 
 train_dtypes = {'TERMINALNO': 'int32',
@@ -382,7 +382,7 @@ def process(CURRENT_PATH):
         targets.append(term['Y'].iloc[0])
     del train
 
-    targets = pd.cut(targets, [-0.1, 0.45, 1.38, 1000], labels=False)
+    targets = pd.cut(targets, [-0.1, 0,  0.45, 1.38, 1000], labels=False)
     num_class = max(targets)+1
     label_names = ['label_'+str(i) for i in range(num_class)]
     targets = pd.DataFrame(to_categorical(targets), columns=label_names)
@@ -459,16 +459,16 @@ def process(CURRENT_PATH):
     print('time:{0}'.format((end - start) / 60.0))
 
     print('[4] Predicting...')
-    preds = np.zeros(test_x.shape[0], dtype=np.float32)
+    preds = np.zeros((test_x.shape[0], num_class), dtype=np.float32)
     start = time.time()
     for model in cv_models:
         cv_pred = model.predict(test_x)
-        cv_pred = cv_pred.reshape(-1)
         preds = preds+cv_pred
-    preds = preds/3.0
+    preds = preds/num_class
+    pred_result = np.argmax(preds, axis=1)
     pred_csv = pd.DataFrame(columns=['Id', 'Pred'])
     pred_csv['Id'] = items
-    pred_csv['Pred'] = preds
+    pred_csv['Pred'] = pred_result
     pred_csv.to_csv(os.path.join(CURRENT_PATH, path_test_out + 'pred.csv'), index=False)
     end = time.time()
     print('time:{0}'.format((end - start) / 60.0))

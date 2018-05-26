@@ -116,7 +116,7 @@ def create_dense_cat(user_input_shape, num_class):
     x_user = BatchNormalization()(x_user)
     x_user = Dense(units=256, activation='tanh',
                    kernel_initializer=initializers.glorot_normal(seed=9))(x_user)
-    out_put = Dense(units=num_class, activation=losses.soft_max,
+    out_put = Dense(units=num_class, activation='softmax',
                     kernel_initializer=initializers.glorot_normal(seed=9))(x_user)
     model = Model(inputs=user_input, outputs=out_put)
     return model
