@@ -432,9 +432,9 @@ def get_train_batch_data(x, y, batch_size=16, group_size=8):
     while True:
         np.random.shuffle(idx)
         for batch in range(batches):
-            start = batch*group_size
-            batch_x = np.reshape(x[idx[start:batch_size*group_size], :], (batch_size, group_size, -1))
-            batch_y = np.reshape(y[idx[start:batch_size*group_size]], (batch_size, group_size))
+            start = batch*batch_size*group_size
+            batch_x = np.reshape(x[idx[start:start+batch_size*group_size], :], (batch_size, group_size, -1))
+            batch_y = np.reshape(y[idx[start:start+batch_size*group_size]], (batch_size, group_size))
             yield batch_x, batch_y
 
 

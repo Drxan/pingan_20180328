@@ -40,7 +40,7 @@ path_test_out = "model/"
 
 # --------local test---------
 '''
-path_train = r'D:\yuwei\study\competition\pingan/train.csv'  # 训练文件
+path_train = r'D:\yuwei\study\competition\pingan/train_more.csv'  # 训练文件
 path_test = r'D:\yuwei\study\competition\pingan/test.csv'  # 测试文件
 path_test_out = "model/"
 '''
@@ -52,7 +52,7 @@ path_train = '/home/yw/study/Competition/pingan/train.csv'  # 训练文件
 path_test = '/home/yw/study/Competition/pingan/test.csv'  # 测试文件
 path_test_out = "model/"
 '''
-BATCH_SIZE = 16
+BATCH_SIZE = 32
 GROUP_SIZE = 16
 EPOCHES = 1000
 KFOLD = 3
@@ -367,6 +367,21 @@ def decomposition(x, n_comp=10, train=True, trunc_svd=None):
         return x_svd
 
 
+def get_cnn_xy(x, y, image_height, pad=False):
+    x_dim = x.shape[1]
+    x_num = x.shape[0]
+    mod_num = x_num % image_height
+
+    if pad:
+        return None
+    else:
+        x = x[0:x_num - mod_num, :]
+        y = y[0:x_num - mod_num]
+
+    x = np.reshape(x, (-1, image_height, x_dim))
+    y = np.reshape(y, (-1, image_height))
+    return x, y
+
 def process(CURRENT_PATH):
     bst_model = os.path.join(CURRENT_PATH, model_path)
     conti_features = [c for c in features if c not in cat_features]
@@ -418,7 +433,11 @@ def process(CURRENT_PATH):
         # print('CV {0}...'.format(i+1))
         np.random.seed(i+9)
         x_train, x_val, y_train, y_val = train_test_split(train_x, targets, test_size=0.25, random_state=i+9)
-        val_steps = pingan.data_helper_mulprocess.get_step((len(x_val)//GROUP_SIZE), BATCH_SIZE)
+
+        x_val, y_val = get_cnn_xy(x_val, y_val, GROUP_SIZE)
+
+        gc.collect()
+
         train_steps = pingan.data_helper_mulprocess.get_step(len(x_train)//GROUP_SIZE, BATCH_SIZE)
 
         train_hist = model.fit_generator(
@@ -426,8 +445,7 @@ def process(CURRENT_PATH):
             steps_per_epoch=train_steps,
             epochs=EPOCHES,
             callbacks=[early_stop, check_point, reduce_lr],
-            validation_data=get_train_batch_data(x_val, y_val, batch_size=BATCH_SIZE, group_size=GROUP_SIZE),
-            validation_steps=val_steps,
+            validation_data=(x_val, y_val),
             initial_epoch=0,
             verbose=0)
 
