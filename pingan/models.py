@@ -101,6 +101,20 @@ def create_dense(user_input_shape):
     model = Model(inputs=user_input, outputs=out_put)
     return model
 
+def create_cnn(input_shape, out_size):
+    x_input = Input(shape=input_shape, name='user_features')
+    ch = Conv1D(filters=256, kernel_size=3, padding='same', activation='relu')(x_input)
+    ch = MaxPooling1D(pool_size=3)(ch)
+    ch = Conv1D(filters=128, kernel_size=3, padding='same', activation='relu')(ch)
+    ch = MaxPooling1D(pool_size=K.get_variable_shape(ch)[1])(ch)
+    ch = Flatten()(ch)
+
+    dh = Dense(units=128, activation='relu')(ch)
+    output = Dense(units=out_size)(dh)
+
+    model = Model(inputs=x_input, outputs=output)
+    return model
+
 
 def create_cnn_dense(trip_input_shape, user_input_shape):
     # cnn part

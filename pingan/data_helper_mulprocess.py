@@ -418,3 +418,37 @@ def get_step(data_len, batch_size):
     else:
         pred_steps = base_step
     return pred_steps
+
+
+def get_train_batch_data(x, y, batch_size=16, group_size=8):
+
+    idx = np.arange(len(x))
+    sample_num = len(x)//group_size
+    if sample_num < batch_size:
+        batches = 1
+        batch_size = sample_num
+    else:
+        batches = sample_num // batch_size
+    while True:
+        np.random.shuffle(idx)
+        for batch in range(batches):
+            start = batch*group_size
+            batch_x = np.reshape(x[idx[start:batch_size*group_size], :], (batch_size, group_size, -1))
+            batch_y = np.reshape(y[idx[start:batch_size*group_size]], (batch_size, group_size))
+            yield batch_x, batch_y
+
+
+def get_test_batch_data(x, batch_size=32, group_size=32):
+    idx = np.arange(len(x))
+    sample_num = len(x)//group_size
+    if sample_num < batch_size:
+        batches = 1
+        batch_size = sample_num
+    else:
+        batches = sample_num // batch_size
+    while True:
+        np.random.shuffle(idx)
+        for batch in range(batches):
+            start = batch*group_size
+            batch_x = np.reshape(x[idx[start:batch_size*group_size], :], (batch_size, group_size, -1))
+            yield batch_x
