@@ -42,7 +42,7 @@ def ndcg(y_true, y_pred, batch_size=32, group_size=16):
     sort_y_true = tf.gather_nd(y_true, tf.stack(auxiliary_indices[:-1] + [y_pred_idx], axis=-1))
 
     rank = (list(np.arange(1, group_size+1))) * batch_size
-    ranks = tf.constant(rank, dtype=tf.float64, shape=(batch_size, group_size))
+    ranks = tf.constant(rank, dtype=tf.float32, shape=(batch_size, group_size))
 
     idcg = tf.reduce_sum(tf.div(y_true_sort, tf.log(np.e + ranks)), -1)
     dcg = tf.reduce_sum(tf.div(sort_y_true, tf.log(np.e + ranks)), -1)

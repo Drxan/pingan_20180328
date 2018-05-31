@@ -32,18 +32,18 @@ from pingan.data_helper_mulprocess import get_test_batch_data, get_train_batch_d
 """
 model_path = 'datas/model_data/model.h5'
 # ---------submit------------
-'''
+
 path_train = '/data/dm/train.csv'
 path_test = '/data/dm/test.csv'
 path_test_out = "model/"
-'''
+
 
 # --------local test---------
-
+'''
 path_train = r'D:\yuwei\study\competition\pingan/train_more.csv'  # 训练文件
 path_test = r'D:\yuwei\study\competition\pingan/test.csv'  # 测试文件
 path_test_out = "model/"
-
+'''
 
 
 # --------local test---------
@@ -53,7 +53,7 @@ path_test = '/home/yw/study/Competition/pingan/test.csv'  # 测试文件
 path_test_out = "model/"
 '''
 BATCH_SIZE = 32
-GROUP_SIZE = 16
+GROUP_SIZE = 5
 EPOCHES = 1000
 KFOLD = 3
 
@@ -398,7 +398,11 @@ def process(CURRENT_PATH):
         targets.append(term['Y'].iloc[0])
     del train
 
-    targets = np.array(targets)
+    # targets = np.array(targets)
+    targets = pd.Series(targets)
+    targets.loc[targets == 0] = -1
+    targets = targets.values
+
     train_x = pd.DataFrame(train_x, columns=features, dtype=np.float32)
     train_x = train_x.fillna(-1)
 
@@ -429,7 +433,7 @@ def process(CURRENT_PATH):
     cv_bst_epoch = []
     for i in range(KFOLD):
         model = models.create_cnn((GROUP_SIZE, x_dim), GROUP_SIZE)
-        model.compile(optimizer='adam', loss=losses.mse)
+        model.compile(optimizer='adam', loss=losses.cosine)
         # print('CV {0}...'.format(i+1))
         np.random.seed(i+9)
         x_train, x_val, y_train, y_val = train_test_split(train_x, targets, test_size=0.25, random_state=i+9)
