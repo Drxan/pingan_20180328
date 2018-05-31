@@ -32,20 +32,22 @@ def cosine_proximity(y_true, y_pred):
     return -K.mean(y_true * y_pred, axis=-1)
 
 
-def ndcg(y_true, y_pred, group_size=8):
-    a=np.sort(y_true, axis=-1)
-    print('a type',type(a))
-    sample_num = tf.size(y_pred)
-    print(sample_num)
-    ranks = np.arange(1, group_size + 1)
-    # idcg
-    y_true_sort = np.sort(y_true)[::-1]
-    idcg = y_true[0] + np.sum(y_true[1:] / np.log2(ranks[1:]))
-    # dcg
-    #dcg = y_true_new[0] + np.sum(y_true_new[1:] / np.log2(ranks[1:]))
-    # ndcg
-    #ndcg_score = dcg/idcg
-    return idcg
+def ndcg(y_true, y_pred, batch_size=32, group_size=16):
+    y_true_sort, y_true_idx = tf.nn.top_k(y_true, k=group_size)
+    y_pred_sort, y_pred_idx = tf.nn.top_k(y_pred, k=group_size)
+    # 对y_true按照y_pred排序
+    shape_y_pred = tf.shape(y_pred)
+    auxiliary_indices = tf.meshgrid(
+        *[tf.range(d) for d in (tf.unstack(shape_y_pred[:(y_pred.get_shape().ndims - 1)]) + [group_size])], indexing='ij')
+    sort_y_true = tf.gather_nd(y_true, tf.stack(auxiliary_indices[:-1] + [y_pred_idx], axis=-1))
+
+    rank = (list(np.arange(1, group_size+1))) * batch_size
+    ranks = tf.constant(rank, dtype=tf.float64, shape=(batch_size, group_size))
+
+    idcg = tf.reduce_sum(tf.div(y_true_sort, tf.log(np.e + ranks)), -1)
+    dcg = tf.reduce_sum(tf.div(sort_y_true, tf.log(np.e + ranks)), -1)
+    ndcg_score = tf.div(dcg, idcg)
+    return ndcg_score
 
 
 cosine = cosine_proximity

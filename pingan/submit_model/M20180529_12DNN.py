@@ -32,18 +32,18 @@ from pingan.data_helper_mulprocess import get_test_batch_data, get_train_batch_d
 """
 model_path = 'datas/model_data/model.h5'
 # ---------submit------------
-
+'''
 path_train = '/data/dm/train.csv'
 path_test = '/data/dm/test.csv'
 path_test_out = "model/"
-
+'''
 
 # --------local test---------
-'''
+
 path_train = r'D:\yuwei\study\competition\pingan/train_more.csv'  # 训练文件
 path_test = r'D:\yuwei\study\competition\pingan/test.csv'  # 测试文件
 path_test_out = "model/"
-'''
+
 
 
 # --------local test---------
