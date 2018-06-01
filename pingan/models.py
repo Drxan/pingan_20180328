@@ -101,6 +101,25 @@ def create_dense(user_input_shape):
     model = Model(inputs=user_input, outputs=out_put)
     return model
 
+
+def create_cnn_list(input_shape, sub_input_shape, out_size):
+    x_input = Input(shape=input_shape, name='user_features')
+    ch = Conv1D(filters=256, kernel_size=3, padding='same', activation='relu')(x_input)
+    ch = MaxPooling1D(pool_size=3)(ch)
+    ch = Conv1D(filters=128, kernel_size=3, padding='same', activation='relu')(ch)
+    ch = MaxPooling1D(pool_size=K.get_variable_shape(ch)[1])(ch)
+    ch = Flatten()(ch)
+
+
+
+
+    dh = Dense(units=128, activation='relu')(ch)
+    output = Dense(units=out_size)(dh)
+
+    model = Model(inputs=x_input, outputs=output)
+    return model
+
+
 def create_cnn(input_shape, out_size):
     x_input = Input(shape=input_shape, name='user_features')
     ch = Conv1D(filters=256, kernel_size=3, padding='same', activation='relu')(x_input)
@@ -113,6 +132,31 @@ def create_cnn(input_shape, out_size):
     output = Dense(units=out_size)(dh)
 
     model = Model(inputs=x_input, outputs=output)
+    return model
+
+
+def create_cnn2(input_shape, sub_input_shape, out_size=None):
+    x_input = Input(shape=input_shape, name='user_features')
+    ch = Conv1D(filters=256, kernel_size=2, padding='valid', activation='relu')(x_input)
+    ch = Flatten()(ch)
+
+    x1 = Input(shape=sub_input_shape, name='x1')
+    d1 = Dense(units=256, activation='tanh')(x1)
+    merge1 = concatenate([ch, d1])
+    md1 = Dense(units=512, activation='tanh')(merge1)
+    md1 = Dense(units=256, activation='tanh')(md1)
+    md1 = Dense(units=1)(md1)
+
+    x2 = Input(shape=sub_input_shape, name='x2')
+    d2 = Dense(units=256, activation='tanh')(x2)
+    merge2 = concatenate([ch, d2])
+    md2 = Dense(units=512, activation='tanh')(merge2)
+    md2 = Dense(units=256, activation='tanh')(md2)
+    md2 = Dense(units=1)(md2)
+
+    output = concatenate([md1, md2])
+
+    model = Model(inputs=[x_input, x1, x2], outputs=output)
     return model
 
 
