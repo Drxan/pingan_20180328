@@ -27,8 +27,8 @@ def l2_normalize(x, axis):
 
 
 def cosine_proximity(y_true, y_pred):
-    y_true = l2_normalize(y_true, axis=-1)
-    y_pred = l2_normalize(y_pred, axis=-1)
+    y_true = tf.nn.l2_normalize(y_true, dim=-1)
+    y_pred = tf.nn.l2_normalize(y_pred, dim=-1)
     return -K.mean(y_true * y_pred, axis=-1)
 
 
