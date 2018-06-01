@@ -40,7 +40,7 @@ path_test_out = "model/"
 
 # --------local test---------
 '''
-path_train = r'D:\yuwei\study\competition\pingan/train_more.csv'  # 训练文件
+path_train = r'D:\yuwei\study\competition\pingan/train.csv'  # 训练文件
 path_test = r'D:\yuwei\study\competition\pingan/test.csv'  # 测试文件
 path_test_out = "model/"
 '''
@@ -383,6 +383,7 @@ def get_cnn_xy(x, y, image_height, pad=False):
     return x, y
 
 def process(CURRENT_PATH):
+    print("{0} Let's go...".format(time.strftime('%Y-%m-%d %H:%M:%S')))
     bst_model = os.path.join(CURRENT_PATH, model_path)
     conti_features = [c for c in features if c not in cat_features]
     print('[1]>> Extracting train features...')
@@ -433,7 +434,7 @@ def process(CURRENT_PATH):
     cv_bst_epoch = []
     for i in range(KFOLD):
         model = models.create_cnn((GROUP_SIZE, x_dim), GROUP_SIZE)
-        model.compile(optimizer='adam', loss=losses.cosine)
+        model.compile(optimizer='adam', loss=pingan.losses.my_cosine)
         # print('CV {0}...'.format(i+1))
         np.random.seed(i+9)
         x_train, x_val, y_train, y_val = train_test_split(train_x, targets, test_size=0.25, random_state=i+9)
@@ -457,7 +458,7 @@ def process(CURRENT_PATH):
         cv_bst_epoch.append(bst_epoch)
         cv_train_loss.append(train_hist.history['loss'][bst_epoch - 1])
         cv_val_loss.append(train_hist.history['val_loss'][bst_epoch-1])
-        cv_models.append(load_model(bst_model))
+        cv_models.append(load_model(bst_model, custom_objects={"my_cosine_proximity": pingan.losses.my_cosine}))
 
     print('Best epoch:', cv_bst_epoch)
     print('val_loss:', cv_val_loss)

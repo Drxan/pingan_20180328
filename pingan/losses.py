@@ -26,7 +26,7 @@ def l2_normalize(x, axis):
     return tf.nn.l2_normalize(x, dim=axis)
 
 
-def cosine_proximity(y_true, y_pred):
+def my_cosine_proximity(y_true, y_pred):
     y_true = tf.nn.l2_normalize(y_true, dim=-1)
     y_pred = tf.nn.l2_normalize(y_pred, dim=-1)
     return -K.mean(y_true * y_pred, axis=-1)
@@ -50,5 +50,5 @@ def ndcg(y_true, y_pred, batch_size=32, group_size=16):
     return ndcg_score
 
 
-cosine = cosine_proximity
+my_cosine = my_cosine_proximity
 ndcg = ndcg
